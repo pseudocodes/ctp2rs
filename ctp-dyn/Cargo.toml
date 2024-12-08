@@ -1,8 +1,28 @@
 [package]
-name = "ctp-dyn"
+name = "ctp2rs"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+
+[build-dependencies]
+clang-sys = { version = "1.8.1", features = ["clang_16_0", "runtime"] }
+clang = { version = "2.0.0", features = ["clang_10_0"] }
+bindgen = "0.71.0"
+regex = "1.11.1"
+Inflector = "0.11.4"
+
 [dependencies]
+libloading = "0.8.1"
+memchr = "2.7.4"
+futures = "0.3.31"
+
+[features]
+default = ["v1alpha1", "dynlib", "ctp_v6_7_2"]
+dynlib = []
+openctp = ["dynlib"]
+ctp_v6_7_7 = ["dynlib"]
+ctp_v6_7_2 = ["dynlib"]
+v1alpha1 = []
+v1alpha2 = []
