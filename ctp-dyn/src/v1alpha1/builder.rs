@@ -55,7 +55,7 @@ impl MdApi {
     }
 }
 
-pub fn get_api_version<P: AsRef<Path>>(
+pub fn get_api_version_symbol<P: AsRef<Path>>(
     dynlib_path: P,
     symbol: &[u8],
 ) -> Result<String, libloading::Error> {
@@ -69,7 +69,7 @@ pub fn get_api_version<P: AsRef<Path>>(
     }
 }
 
-pub fn get_api_version2<P: AsRef<Path>>(dynlib_path: P) -> Result<String, libloading::Error> {
+pub fn get_api_version<P: AsRef<Path>>(dynlib_path: P) -> Result<String, libloading::Error> {
     let md_symbol = MDAPI_GET_API_VERSION_SYMBOL;
     let td_symbol = TDAPI_GET_API_VERSION_SYMBOL;
 

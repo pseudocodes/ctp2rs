@@ -58,7 +58,7 @@ impl TraderApi {
     }
     
     /// 注册前置机网络地址
-    ///@param pszFrontAddress 前置机网络地址。
+    ///@param pszFrontAddress：前置机网络地址。
     ///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:17001”。
     ///@remark “tcp”代表传输协议，“127.0.0.1”代表服务器地址。”17001”代表服务器端口号。
     pub fn register_front(&self, psz_front_address: &str) {
@@ -69,7 +69,7 @@ impl TraderApi {
     }
     
     /// 注册名字服务器网络地址
-    ///@param pszNsAddress 名字服务器网络地址。
+    ///@param pszNsAddress：名字服务器网络地址。
     ///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:12001”。
     ///@remark “tcp”代表传输协议，“127.0.0.1”代表服务器地址。”12001”代表服务器端口号。
     ///@remark RegisterNameServer优先于RegisterFront
@@ -81,7 +81,7 @@ impl TraderApi {
     }
     
     /// 注册名字服务器用户信息
-    ///@param pFensUserInfo 用户信息。
+    ///@param pFensUserInfo：用户信息。
     pub fn register_fens_user_info(&self, p_fens_user_info: &mut CThostFtdcFensUserInfoField) {
         unsafe {
             ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_RegisterFensUserInfo)(self.api_ptr, p_fens_user_info as *mut CThostFtdcFensUserInfoField)
@@ -153,9 +153,9 @@ impl TraderApi {
     }
     
     /// 用户登录请求
-    pub fn req_user_login(&self, p_req_user_login_field: &mut CThostFtdcReqUserLoginField, n_request_id: i32, length: TThostFtdcSystemInfoLenType, system_info: TThostFtdcClientSystemInfoType) -> i32 {
+    pub fn req_user_login(&self, p_req_user_login_field: &mut CThostFtdcReqUserLoginField, n_request_id: i32) -> i32 {
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_ReqUserLogin)(self.api_ptr, p_req_user_login_field as *mut CThostFtdcReqUserLoginField, n_request_id, length, system_info.as_ptr() as *mut i8)
+            ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_ReqUserLogin)(self.api_ptr, p_req_user_login_field as *mut CThostFtdcReqUserLoginField, n_request_id)
         }
     }
     

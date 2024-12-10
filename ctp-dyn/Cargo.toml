@@ -2,7 +2,22 @@
 name = "ctp2rs"
 version = "0.1.0"
 edition = "2021"
+authors = ["Pseudo <pseudocodes@gmail.com>"]
+description = "Shanghai Futures CTP Rust native binding, supporting production, evaluation, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"
+license = "Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/pseudocodes/ctp2rs/tree/master/ctp-dyn"
+keywords = ["ctp", "ctp-rs", "ctp-binding", "quant", "trader"]
+categories = ["api-bindings", "finance"]
 
+exclude = [
+    "*.log",       # 排除所有 .log 文件
+    "*.tmp",       # 排除所有 .tmp 文件
+    "scripts/*",   # 排除 scripts 文件夹
+    "*.con",
+    "*.framework",
+    "*.so",
+]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
