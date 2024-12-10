@@ -1,6 +1,6 @@
 [package]
 name = "ctp2rs"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Pseudo <pseudocodes@gmail.com>"]
 description = "Shanghai Futures CTP Rust native binding, supporting production, evaluation, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"
@@ -10,14 +10,7 @@ repository = "https://github.com/pseudocodes/ctp2rs/tree/master/ctp-dyn"
 keywords = ["ctp", "ctp-rs", "ctp-binding", "quant", "trader"]
 categories = ["api-bindings", "finance"]
 
-exclude = [
-    "*.log",       # 排除所有 .log 文件
-    "*.tmp",       # 排除所有 .tmp 文件
-    "scripts/*",   # 排除 scripts 文件夹
-    "*.con",
-    "*.framework",
-    "*.so",
-]
+exclude = ["*.log", "*.tmp", "scripts/*", "*.con", "*.framework", "*.so"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
@@ -39,5 +32,6 @@ dynlib = []
 openctp = ["dynlib"]
 ctp_v6_7_7 = ["dynlib"]
 ctp_v6_7_2 = ["dynlib"]
+ctp_v6_7_8 = ["dynlib"]
 v1alpha1 = []
 v1alpha2 = []

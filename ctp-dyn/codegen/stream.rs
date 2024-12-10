@@ -175,12 +175,19 @@ pub fn handle_module_spi_stream(ctx: &Context, e: &Entity, items: &ItemVec) -> S
 
     let declare_code = format!(
         r#"
-struct {spi_trait}Inner {{
+pub struct {spi_trait}Inner {{
     buf: std::collections::VecDeque<{spi_trait}Event>,
     waker: Option<Waker>,
 }}
 
 impl {spi_trait}Inner {{
+    pub fn new() -> Self {{
+        Self {{
+            buf: std::collections::VecDeque::new(),
+            waker: None,
+        }}
+    }}
+
     fn push(&mut self, msg: {spi_trait}Event) {{
         self.buf.push_back(msg);
         if let Some(waker) = self.waker.take() {{
@@ -191,6 +198,14 @@ impl {spi_trait}Inner {{
 
 pub struct {spi_trait}Stream {{
     inner: Arc<Mutex<{spi_trait}Inner>>,
+}}
+
+impl {spi_trait}Stream {{
+    pub fn new(inner: {spi_trait}Inner) -> Self {{
+        Self {{
+            inner: Arc::new(Mutex::new(inner)),
+        }}
+    }}
 }}
 
 impl Stream for {spi_trait}Stream {{
@@ -213,7 +228,8 @@ impl Stream for {spi_trait}Stream {{
     fn size_hint(&self) -> (usize, Option<usize>) {{
         (0, None)
     }}
-}}"#
+}}
+    "#
     );
 
     format!(

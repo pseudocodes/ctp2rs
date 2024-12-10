@@ -118,19 +118,6 @@ impl Drop for MdApi {
     }
 }
 
-impl std::ops::Deref for MdApi {
-    type Target = CThostFtdcMdApi;
-    fn deref(&self) -> &Self::Target {
-        unsafe { &(*self.api_ptr) }
-    }
-}
-
-impl std::ops::DerefMut for MdApi {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { &mut (*self.api_ptr) }
-    }
-}
-
 #[derive(Debug, Default)]
 pub struct MdApiBuilder {
     flow_path: Option<String>,
@@ -262,18 +249,5 @@ impl Drop for TraderApi {
                 ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_Release)(self.api_ptr);
             }
         }
-    }
-}
-
-impl std::ops::Deref for TraderApi {
-    type Target = CThostFtdcTraderApi;
-    fn deref(&self) -> &Self::Target {
-        unsafe { &(*self.api_ptr) }
-    }
-}
-
-impl std::ops::DerefMut for TraderApi {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        unsafe { &mut (*self.api_ptr) }
     }
 }

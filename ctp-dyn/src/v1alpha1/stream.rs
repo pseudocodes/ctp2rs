@@ -12,12 +12,19 @@ use crate::v1alpha1::mdspi::*;
 use crate::v1alpha1::traderspi::*;
 
 
-struct MdSpiInner {
+pub struct MdSpiInner {
     buf: std::collections::VecDeque<MdSpiEvent>,
     waker: Option<Waker>,
 }
 
 impl MdSpiInner {
+    pub fn new() -> Self {
+        Self {
+            buf: std::collections::VecDeque::new(),
+            waker: None,
+        }
+    }
+
     fn push(&mut self, msg: MdSpiEvent) {
         self.buf.push_back(msg);
         if let Some(waker) = self.waker.take() {
@@ -28,6 +35,14 @@ impl MdSpiInner {
 
 pub struct MdSpiStream {
     inner: Arc<Mutex<MdSpiInner>>,
+}
+
+impl MdSpiStream {
+    pub fn new(inner: MdSpiInner) -> Self {
+        Self {
+            inner: Arc::new(Mutex::new(inner)),
+        }
+    }
 }
 
 impl Stream for MdSpiStream {
@@ -51,6 +66,7 @@ impl Stream for MdSpiStream {
         (0, None)
     }
 }
+    
 impl MdSpi for MdSpiStream { 
    
     fn on_front_connected(&mut self) {
@@ -182,12 +198,19 @@ impl MdSpi for MdSpiStream {
 }
     
 
-struct TraderSpiInner {
+pub struct TraderSpiInner {
     buf: std::collections::VecDeque<TraderSpiEvent>,
     waker: Option<Waker>,
 }
 
 impl TraderSpiInner {
+    pub fn new() -> Self {
+        Self {
+            buf: std::collections::VecDeque::new(),
+            waker: None,
+        }
+    }
+
     fn push(&mut self, msg: TraderSpiEvent) {
         self.buf.push_back(msg);
         if let Some(waker) = self.waker.take() {
@@ -198,6 +221,14 @@ impl TraderSpiInner {
 
 pub struct TraderSpiStream {
     inner: Arc<Mutex<TraderSpiInner>>,
+}
+
+impl TraderSpiStream {
+    pub fn new(inner: TraderSpiInner) -> Self {
+        Self {
+            inner: Arc::new(Mutex::new(inner)),
+        }
+    }
 }
 
 impl Stream for TraderSpiStream {
@@ -221,6 +252,7 @@ impl Stream for TraderSpiStream {
         (0, None)
     }
 }
+    
 impl TraderSpi for TraderSpiStream { 
    
     fn on_front_connected(&mut self) {

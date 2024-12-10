@@ -97,6 +97,9 @@ impl MdSpi for ChannelSpi {
 }
 
 pub fn run_channel_md() {
+    if std::env::var("RUST_LOG").is_err() {
+        std::env::set_var("RUST_LOG", "info")
+    }
     dotenv::dotenv().ok();
     env_logger::init();
     println!("mdapi start here!");

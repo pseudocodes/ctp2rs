@@ -1,4 +1,4 @@
-#![allow(unused_variables, unused_macros)]
+#![allow(unused_variables, unused_macros, unreachable_code)]
 use std::env::var;
 
 use std::fs;
@@ -40,6 +40,19 @@ fn get_sdk_path() -> &'static std::path::Path {
 
         #[cfg(target_os = "linux")]
         return Path::new("./api/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+    }
+
+    #[cfg(feature = "ctp_v6_7_8")]
+    {
+        #[cfg(feature = "openctp")]
+        compile_error!("`openctp` feature not support for `v6_7_8`.");
+        // return Path::new("../api/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64/");
+
+        #[cfg(target_os = "macos")]
+        compile_error!("`macOS platform` not support for `v6_7_8 now`.");
+
+        #[cfg(target_os = "linux")]
+        return Path::new("./api/v6.7.8/v6.7.8_20240918_api_traderapi_se_linux64");
     }
 
     // 默认情况下触发编译错误
