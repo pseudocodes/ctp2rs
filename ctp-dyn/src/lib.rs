@@ -5,5 +5,7 @@
 #![allow(unused_variables, unused_mut)]
 #![allow(unused_imports)]
 
+pub mod ffi;
+use ffi::*;
+
 pub mod v1alpha1;
-use v1alpha1::*;

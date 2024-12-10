@@ -91,10 +91,10 @@ impl MdApi {
     /// 注册回调接口
     ///@param pSpi 派生自回调接口类的实例
     pub fn register_spi(&self, p_spi: *mut dyn MdSpi) {
-        let spi_ptr: *mut CThostFtdcMdSpiExt = Box::into_raw(Box::new(CThostFtdcMdSpiExt::new(p_spi)));
-        let last_spi_ptr: *mut CThostFtdcMdSpiExt = self.spi_ptr.get();
+        let spi_ptr = Box::into_raw(Box::new(CThostFtdcMdSpiExt::new(p_spi)));
+        let last_spi_ptr = self.spi_ptr.get();
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterSpi)(self.api_ptr, spi_ptr as *mut CThostFtdcMdSpi)
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterSpi)(self.api_ptr, spi_ptr as _)
         }
         self.spi_ptr.set(spi_ptr);
         if !last_spi_ptr.is_null() {

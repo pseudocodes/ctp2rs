@@ -1,3 +1,3 @@
 [workspace]
-members = ["ctp-dyn", "ctp-vt"]
+members = ["ctp-dyn", "ctp-vt", "examples/*"]
 resolver = "2"

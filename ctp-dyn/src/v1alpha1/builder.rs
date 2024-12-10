@@ -17,13 +17,12 @@ pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN15CThostFtdcMdApi13GetApiVe
 pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN19CThostFtdcTraderApi13GetApiVersionEv";
 
 impl MdApi {
-    pub fn create_api<P: AsRef<Path>>(
+    pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(
         dynlib_path: P,
-        flow_path: P,
+        flow_path: F,
         is_using_udp: bool,
         is_multicast: bool,
     ) -> Self {
-        // CThostFtdcMdApi_CreateFtdcMdApi(flow_path, is_using_udp, is_multicast)
         let dynlib =
             unsafe { libloading::Library::new(dynlib_path.as_ref()).expect("failed to open") };
         type MdApiCreator = unsafe extern "C" fn(*const c_char, bool, bool) -> *mut CThostFtdcMdApi;
@@ -100,7 +99,6 @@ pub fn get_api_version2<P: AsRef<Path>>(dynlib_path: P) -> Result<String, libloa
 
 impl Drop for MdApi {
     fn drop(&mut self) {
-        println!("drop nothing");
         let spi_ptr = self.spi_ptr.get();
         if !spi_ptr.is_null() {
             unsafe {
@@ -117,6 +115,19 @@ impl Drop for MdApi {
                 ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Release)(self.api_ptr);
             }
         }
+    }
+}
+
+impl std::ops::Deref for MdApi {
+    type Target = CThostFtdcMdApi;
+    fn deref(&self) -> &Self::Target {
+        unsafe { &(*self.api_ptr) }
+    }
+}
+
+impl std::ops::DerefMut for MdApi {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { &mut (*self.api_ptr) }
     }
 }
 
@@ -200,7 +211,7 @@ impl MdApiBuilder {
 }
 
 impl TraderApi {
-    pub fn create_api<P: AsRef<Path>>(dynlib_path: P, flow_path: P) -> Self {
+    pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(dynlib_path: P, flow_path: F) -> Self {
         // CThostFtdcMdApi_CreateFtdcMdApi(flow_path, is_using_udp, is_multicast)
         let dynlib =
             unsafe { libloading::Library::new(dynlib_path.as_ref()).expect("failed to open") };
@@ -230,5 +241,39 @@ impl TraderApi {
             let c_str: &CStr = CStr::from_ptr(cstr_ptr);
             c_str.to_string_lossy().to_string()
         }
+    }
+}
+
+impl Drop for TraderApi {
+    fn drop(&mut self) {
+        let spi_ptr = self.spi_ptr.get();
+        if !spi_ptr.is_null() {
+            unsafe {
+                ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_RegisterSpi)(
+                    self.api_ptr,
+                    std::ptr::null_mut(),
+                );
+                let last_spi = Box::from_raw(spi_ptr); // 释放动态分配的内存
+                drop(last_spi);
+            }
+        }
+        unsafe {
+            if !self.api_ptr.is_null() {
+                ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_Release)(self.api_ptr);
+            }
+        }
+    }
+}
+
+impl std::ops::Deref for TraderApi {
+    type Target = CThostFtdcTraderApi;
+    fn deref(&self) -> &Self::Target {
+        unsafe { &(*self.api_ptr) }
+    }
+}
+
+impl std::ops::DerefMut for TraderApi {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        unsafe { &mut (*self.api_ptr) }
     }
 }

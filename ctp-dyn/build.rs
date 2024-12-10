@@ -19,14 +19,14 @@ fn get_sdk_path() -> &'static std::path::Path {
     // 基于版本的分支判断
     #[cfg(feature = "ctp_v6_7_2")]
     {
-        #[cfg(feature = "openctp")]
+        #[cfg(all(feature = "openctp", target_os = "macos"))]
         return Path::new("./api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
 
         #[cfg(target_os = "macos")]
         return Path::new("./api/v6.7.2/v6.7.2_MacOS_20231016");
 
         #[cfg(target_os = "linux")]
-        return Path::new("../api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
+        return Path::new("./api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
     }
 
     #[cfg(feature = "ctp_v6_7_7")]

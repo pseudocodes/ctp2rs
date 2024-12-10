@@ -263,10 +263,10 @@ pub fn _convert_api_registerspi_func(ctx: &Context, e: &Entity, params: &ParamVe
     if ctx.cfg.wrap_api_struct {
         unsafe_code = format!(
             r#"
-        let spi_ptr: *mut {spi_name}Ext = Box::into_raw(Box::new({spi_name}Ext::new({arg_0_name})));
-        let last_spi_ptr: *mut {spi_name}Ext = self.spi_ptr.get();
+        let spi_ptr = Box::into_raw(Box::new({spi_name}Ext::new({arg_0_name})));
+        let last_spi_ptr = self.spi_ptr.get();
         unsafe {{
-            ((*(*self.api_ptr).vtable_).{api_class}_RegisterSpi)(self.api_ptr, spi_ptr as *mut {spi_name})
+            ((*(*self.api_ptr).vtable_).{api_class}_RegisterSpi)(self.api_ptr, spi_ptr as _)
         }}
         self.spi_ptr.set(spi_ptr);
         if !last_spi_ptr.is_null() {{
@@ -900,5 +900,5 @@ fn strip_prefix_set(input: &str) -> String {
             return stripped.to_string();
         }
     }
-    input.to_string() // 如果没有匹配任何前缀，返回原字符串
+    input.into() // 如果没有匹配任何前缀，返回原字符串
 }
