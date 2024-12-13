@@ -17,47 +17,48 @@ macro_rules! p {
 }
 fn get_sdk_path() -> &'static std::path::Path {
     // 基于版本的分支判断
-    #[cfg(feature = "ctp_v6_7_2")]
-    {
-        #[cfg(all(feature = "openctp", target_os = "macos"))]
-        return Path::new("./api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
 
-        #[cfg(target_os = "macos")]
-        return Path::new("./api/v6.7.2/v6.7.2_MacOS_20231016");
-
-        #[cfg(target_os = "linux")]
-        return Path::new("./api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
+    if cfg!(feature = "mini_v1_6_9") {
+        return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_linux64_api_20240527/");
     }
 
-    #[cfg(feature = "ctp_v6_7_7")]
-    {
-        #[cfg(feature = "openctp")]
-        compile_error!("`openctp` feature not support for `v6_7_7`.");
-        // return Path::new("../api/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64/");
-
-        #[cfg(target_os = "macos")]
-        return Path::new("./api/v6.7.7/v6.7.7_MacOS_20240716");
-
-        #[cfg(target_os = "linux")]
-        return Path::new("./api/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+    if cfg!(feature = "ctp_v6_7_7") {
+        if cfg!(feature = "openctp") {
+            panic!("`openctp` feature not supported for `v6_7_7`.");
+        }
+        if cfg!(target_os = "macos") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_MacOS_20240716");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+        }
     }
 
-    #[cfg(feature = "ctp_v6_7_8")]
-    {
-        #[cfg(feature = "openctp")]
-        compile_error!("`openctp` feature not support for `v6_7_8`.");
-        // return Path::new("../api/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64/");
-
-        #[cfg(target_os = "macos")]
-        compile_error!("`macOS platform` not support for `v6_7_8 now`.");
-
-        #[cfg(target_os = "linux")]
-        return Path::new("./api/v6.7.8/v6.7.8_20240918_api_traderapi_se_linux64");
+    if cfg!(feature = "ctp_v6_7_8") {
+        if cfg!(feature = "openctp") {
+            panic!("`openctp` feature not supported for `v6_7_8`.");
+        }
+        if cfg!(target_os = "macos") {
+            panic!("`macOS platform` not supported for `v6_7_8`.");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.8/v6.7.8_20240918_api_traderapi_se_linux64");
+        }
     }
 
-    // 默认情况下触发编译错误
-    #[cfg(not(any(feature = "ctp_v6_7_2", feature = "ctp_v6_7_7")))]
-    compile_error!("Either 'ctp_v6_7_2' or 'ctp_v6_7_7' feature must be enabled.");
+    if cfg!(feature = "ctp_v6_7_2") {
+        if cfg!(feature = "openctp") {
+            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
+        }
+        if cfg!(target_os = "macos") {
+            return Path::new("./api/ctp/v6.7.2/v6.7.2_MacOS_20231016");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
+        }
+    }
+
+    panic!("Either 'ctp_v6_7_2' or 'ctp_v6_7_7' feature must be enabled.");
 }
 
 fn ensure_dir_exists(path: &PathBuf) -> io::Result<()> {
@@ -98,9 +99,10 @@ fn build_dyn() {
         .parse()
         .unwrap();
 
-    generate_mduser_wrapper_code(&tu.get_entity(), &generate_dir);
-    generate_trader_wrapper_code(&tu.get_entity(), &generate_dir);
-    generate_stream_wrapper_code(&tu.get_entity(), &generate_dir);
+    let out_path = PathBuf::from(var("OUT_DIR").unwrap());
+    generate_mduser_wrapper_code(&tu.get_entity(), &out_path);
+    generate_trader_wrapper_code(&tu.get_entity(), &out_path);
+    generate_stream_wrapper_code(&tu.get_entity(), &out_path);
 
     let bindings = bindgen::Builder::default()
         .header("src/wrapper.hpp")
@@ -120,7 +122,7 @@ fn build_dyn() {
         .generate()
         .expect("Unable to generate bindings");
 
-    let binding_file = generate_dir.join("bindings.rs");
+    let binding_file = out_path.join("bindings.rs");
     bindings
         .write_to_file(&binding_file)
         .expect("Couldn't write bindings!");

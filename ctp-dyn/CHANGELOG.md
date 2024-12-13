@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased] - 2024-12-13
+
+### Changed
+
+- 更新支持 CTP-Mini v1.6.9 Linux 版
+- 更新 build.rs 
+- 自动生成代码移入 `OUT_DIR` 目录, 项目中保留的文件实际不参与编译构建，仅作为学习展示
+
+
 ## [Unreleased] - 2024-12-12
 
 ### Changed

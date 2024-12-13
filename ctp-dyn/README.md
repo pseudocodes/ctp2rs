@@ -1,6 +1,6 @@
 # Ctp2rs
 
-采用 libloading 加载 ctp 动态库的 CTP API 的 Rust 绑定封装
+采用 `libloading` 加载 `ctp/ctp-mini` 动态库的 CTP API 的 Rust 绑定封装
 历史项目 `ctp-dyn`
 
 
@@ -20,11 +20,22 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 
 * **切换 CTP API 版本**
 
-当前最低支持 CTP `v6.7.2` 版本， 具体支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段
+已加入项目的 CTP 柜台版本
+| version         | feature     | Linux | macOS | Windows |
+| :-------------- | ----------- | ----- | ----- | :------ |
+| ctp v6.7.2      | ctp_v6_7_2  | x     | x     |         |
+| ctp v6.7.7      | ctp_v6_7_7  | x     | x     |         |
+| ctp v6.7.8      | ctp_v6_7_8  | x     |       |         |
+| ctp-mini v1.6.9 | mini_v1_6_9 | x     |       |         |
+
+
+实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段
 ```toml
 [dependencies]
 ctp2rs = { version = "0.1.1", features = ["ctp_v6_7_7"] }
 ```
+
+
 
 * **基本样例**
 
@@ -96,9 +107,12 @@ g++ (Ubuntu 11.2.0-19ubuntu1) 11.2.0
 rustc 1.77.2 (25ef9e3d8 2024-04-09)
 ```
 
+## Notice
+自动生成代码在构建中移入 `OUT_DIR` 目录, 项目中保留的文件实际不参与编译构建，仅作为参考展示
+
 ## Reference 
 
-【1】*[OpenCTP](http://openctp.cn/download.html): 类上期技术 SimNow 开放模拟环境*
+【1】*[OpenCTP](http://openctp.cn/download.html): 类上期技术 `Simnow` 开放模拟环境*
 
 【2】*[LocalCTP](https://github.com/dearleeyoung/LocalCTP): 部署于本地的仿 CTP 项目*
 

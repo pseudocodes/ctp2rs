@@ -1,9 +1,9 @@
 # Ctp2rs
-上海期货信息技术公司 CTP 接口 rust 语言原生封装
+上海期货信息技术公司 CTP/CTP-Mini 接口 rust 语言原生封装
 
 
 ## Features
-* 支持生产，测评，OpenCTP, LocalCTP 等兼容 CTP 接口的动态库版本, 适配 Linux, MacOS
+* 支持生产，测评，CTP-Mini, OpenCTP, LocalCTP 等兼容 CTP 接口的动态库版本, 适配 Linux, MacOS
 * 采用 libloading 加载动态库，通过程序配置可以轻松切换不同柜台环境
 * 编译指令自动切换 ctp 版本
 * 保持与原生 ctp 接口一致的调用方式，更方便跨语言的项目转写

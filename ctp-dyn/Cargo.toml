@@ -1,9 +1,9 @@
 [package]
 name = "ctp2rs"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Pseudo <pseudocodes@gmail.com>"]
-description = "Shanghai Futures CTP Rust native binding, supporting production, evaluation, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"
+description = "Shanghai Futures CTP/CTP-Mini Rust native binding, supporting production, evaluation, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/pseudocodes/ctp2rs/tree/master/ctp-dyn"
@@ -33,5 +33,6 @@ openctp = ["dynlib"]
 ctp_v6_7_7 = ["dynlib"]
 ctp_v6_7_2 = ["dynlib"]
 ctp_v6_7_8 = ["dynlib"]
+mini_v1_6_9 = ["dynlib"]
 v1alpha1 = []
 v1alpha2 = []

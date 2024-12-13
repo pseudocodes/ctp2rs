@@ -326,6 +326,7 @@ pub fn _convert_api_incomplete_array_func(ctx: &Context, e: &Entity, params: &Pa
         )
     };
 
+    let api_class = &ctx.cfg.source_class_name;
     let (arg_0_name, arg_0_type, param_0_call) = (&params[0]);
     let args_text = format!("{self_text}, {arg_0_name}: {arg_0_type}");
 
@@ -333,7 +334,7 @@ pub fn _convert_api_incomplete_array_func(ctx: &Context, e: &Entity, params: &Pa
         format!(
             r#"
         unsafe {{
-            ((*(*{self_p0}).vtable_).CThostFtdcMdApi_{method_call})({self_p1}, {param_0_call}, {arg_0_name}.len() as i32)
+            ((*(*{self_p0}).vtable_).{api_class}_{method_call})({self_p1}, {param_0_call}, {arg_0_name}.len() as i32)
         }}"#,
         )
     } else {
@@ -342,7 +343,7 @@ pub fn _convert_api_incomplete_array_func(ctx: &Context, e: &Entity, params: &Pa
         let cstrings: Vec<_> = {arg_0_name}.iter().map(|x| CString::new(x.clone()).unwrap()).collect();
         let cstr_slice: Vec<*const i8> = cstrings.iter().map(|cstr| cstr.as_ptr()).collect();
         unsafe {{
-            ((*(*{self_p0}).vtable_).CThostFtdcMdApi_{method_call})({self_p1}, cstr_slice.as_ptr() as *mut *mut i8, {arg_0_name}.len() as i32)
+            ((*(*{self_p0}).vtable_).{api_class}_{method_call})({self_p1}, cstr_slice.as_ptr() as *mut *mut i8, {arg_0_name}.len() as i32)
         }}"#,
         )
     };
@@ -509,11 +510,12 @@ pub fn _convert_api_general_func(ctx: &Context, e: &Entity, params: &ParamVec) -
 
 pub fn convert_api_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
     let func_name = e.get_name().unwrap();
+
+    if func_name.contains("Subscribe") && params[0].1.contains("Vec") {
+        return _convert_api_incomplete_array_func(ctx, e, params);
+    }
+
     let func_code = match func_name.as_str() {
-        "SubscribeMarketData"
-        | "UnSubscribeMarketData"
-        | "SubscribeForQuoteRsp"
-        | "UnSubscribeForQuoteRsp" => _convert_api_incomplete_array_func(ctx, e, params),
         "RegisterFront" | "RegisterNameServer" => _convert_api_char_s_func(ctx, e, params),
         "RegisterSpi" => _convert_api_registerspi_func(ctx, e, params),
         _ => _convert_api_general_func(ctx, e, params),
