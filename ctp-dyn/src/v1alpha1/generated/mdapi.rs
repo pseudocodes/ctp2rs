@@ -10,42 +10,36 @@ use std::{
 use libloading::Library;
 
 use crate::v1alpha1::bindings::*;
-use crate::v1alpha1::mdspi::*;    
+use crate::v1alpha1::mdspi::*;
 
 pub struct MdApi {
     pub api_ptr: *mut CThostFtdcMdApi,
-    pub spi_ptr: Cell<* mut CThostFtdcMdSpiExt>,
-    pub dynlib: Option<Library>,          
+    pub spi_ptr: Cell<*mut CThostFtdcMdSpiExt>,
+    pub dynlib: Option<Library>,
 }
 
 unsafe impl Sync for MdApi {}
 unsafe impl Send for MdApi {}
 
 impl MdApi {
-        /// 删除接口对象本身
+    /// 删除接口对象本身
     ///@remark 不再使用本接口对象时,调用该函数删除接口对象
     pub fn release(&self) {
-        unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Release)(self.api_ptr)
-        }
+        unsafe { ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Release)(self.api_ptr) }
     }
-    
+
     /// 初始化
     ///@remark 初始化运行环境,只有调用后,接口才开始工作
     pub fn init(&self) {
-        unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Init)(self.api_ptr)
-        }
+        unsafe { ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Init)(self.api_ptr) }
     }
-    
+
     /// 等待接口线程结束运行
     ///@return 线程退出代码
     pub fn join(&self) -> i32 {
-        unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Join)(self.api_ptr)
-        }
+        unsafe { ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Join)(self.api_ptr) }
     }
-    
+
     /// 获取当前交易日
     ///@retrun 获取到的交易日
     ///@remark 只有登录成功后,才能得到正确的交易日
@@ -56,7 +50,7 @@ impl MdApi {
             c_str.to_string_lossy().to_string()
         }
     }
-    
+
     /// 注册前置机网络地址
     ///@param pszFrontAddress：前置机网络地址。
     ///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:17001”。
@@ -64,10 +58,13 @@ impl MdApi {
     pub fn register_front(&self, psz_front_address: &str) {
         unsafe {
             let psz_front_address = CString::new(psz_front_address).unwrap();
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterFront)(self.api_ptr, psz_front_address.as_ptr() as *mut i8)
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterFront)(
+                self.api_ptr,
+                psz_front_address.as_ptr() as *mut i8,
+            )
         }
     }
-    
+
     /// 注册名字服务器网络地址
     ///@param pszNsAddress：名字服务器网络地址。
     ///@remark 网络地址的格式为：“protocol://ipaddress:port”，如：”tcp://127.0.0.1:12001”。
@@ -76,18 +73,24 @@ impl MdApi {
     pub fn register_name_server(&self, psz_ns_address: &str) {
         unsafe {
             let psz_ns_address = CString::new(psz_ns_address).unwrap();
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterNameServer)(self.api_ptr, psz_ns_address.as_ptr() as *mut i8)
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterNameServer)(
+                self.api_ptr,
+                psz_ns_address.as_ptr() as *mut i8,
+            )
         }
     }
-    
+
     /// 注册名字服务器用户信息
     ///@param pFensUserInfo：用户信息。
     pub fn register_fens_user_info(&self, p_fens_user_info: &mut CThostFtdcFensUserInfoField) {
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterFensUserInfo)(self.api_ptr, p_fens_user_info as *mut CThostFtdcFensUserInfoField)
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterFensUserInfo)(
+                self.api_ptr,
+                p_fens_user_info as *mut CThostFtdcFensUserInfoField,
+            )
         }
     }
-    
+
     /// 注册回调接口
     ///@param pSpi 派生自回调接口类的实例
     pub fn register_spi(&self, p_spi: *mut dyn MdSpi) {
@@ -103,75 +106,125 @@ impl MdApi {
             }
         }
     }
-    
+
     /// 订阅行情。
     ///@param ppInstrumentID 合约ID
     ///@param nCount 要订阅/退订行情的合约个数
     ///@remark
     pub fn subscribe_market_data(&self, pp_instrument_id: &Vec<String>) -> i32 {
-        let cstrings: Vec<_> = pp_instrument_id.iter().map(|x| CString::new(x.clone()).unwrap()).collect();
+        let cstrings: Vec<_> = pp_instrument_id
+            .iter()
+            .map(|x| CString::new(x.clone()).unwrap())
+            .collect();
         let cstr_slice: Vec<*const i8> = cstrings.iter().map(|cstr| cstr.as_ptr()).collect();
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_SubscribeMarketData)(self.api_ptr, cstr_slice.as_ptr() as *mut *mut i8, pp_instrument_id.len() as i32)
-        }    
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_SubscribeMarketData)(
+                self.api_ptr,
+                cstr_slice.as_ptr() as *mut *mut i8,
+                pp_instrument_id.len() as i32,
+            )
+        }
     }
-    
+
     /// 退订行情。
     ///@param ppInstrumentID 合约ID
     ///@param nCount 要订阅/退订行情的合约个数
     ///@remark
     pub fn unsubscribe_market_data(&self, pp_instrument_id: &Vec<String>) -> i32 {
-        let cstrings: Vec<_> = pp_instrument_id.iter().map(|x| CString::new(x.clone()).unwrap()).collect();
+        let cstrings: Vec<_> = pp_instrument_id
+            .iter()
+            .map(|x| CString::new(x.clone()).unwrap())
+            .collect();
         let cstr_slice: Vec<*const i8> = cstrings.iter().map(|cstr| cstr.as_ptr()).collect();
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_UnSubscribeMarketData)(self.api_ptr, cstr_slice.as_ptr() as *mut *mut i8, pp_instrument_id.len() as i32)
-        }    
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_UnSubscribeMarketData)(
+                self.api_ptr,
+                cstr_slice.as_ptr() as *mut *mut i8,
+                pp_instrument_id.len() as i32,
+            )
+        }
     }
-    
+
     /// 订阅询价。
     ///@param ppInstrumentID 合约ID
     ///@param nCount 要订阅/退订行情的合约个数
     ///@remark
     pub fn subscribe_for_quote_rsp(&self, pp_instrument_id: &Vec<String>) -> i32 {
-        let cstrings: Vec<_> = pp_instrument_id.iter().map(|x| CString::new(x.clone()).unwrap()).collect();
+        let cstrings: Vec<_> = pp_instrument_id
+            .iter()
+            .map(|x| CString::new(x.clone()).unwrap())
+            .collect();
         let cstr_slice: Vec<*const i8> = cstrings.iter().map(|cstr| cstr.as_ptr()).collect();
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_SubscribeForQuoteRsp)(self.api_ptr, cstr_slice.as_ptr() as *mut *mut i8, pp_instrument_id.len() as i32)
-        }    
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_SubscribeForQuoteRsp)(
+                self.api_ptr,
+                cstr_slice.as_ptr() as *mut *mut i8,
+                pp_instrument_id.len() as i32,
+            )
+        }
     }
-    
+
     /// 退订询价。
     ///@param ppInstrumentID 合约ID
     ///@param nCount 要订阅/退订行情的合约个数
     ///@remark
     pub fn unsubscribe_for_quote_rsp(&self, pp_instrument_id: &Vec<String>) -> i32 {
-        let cstrings: Vec<_> = pp_instrument_id.iter().map(|x| CString::new(x.clone()).unwrap()).collect();
+        let cstrings: Vec<_> = pp_instrument_id
+            .iter()
+            .map(|x| CString::new(x.clone()).unwrap())
+            .collect();
         let cstr_slice: Vec<*const i8> = cstrings.iter().map(|cstr| cstr.as_ptr()).collect();
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_UnSubscribeForQuoteRsp)(self.api_ptr, cstr_slice.as_ptr() as *mut *mut i8, pp_instrument_id.len() as i32)
-        }    
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_UnSubscribeForQuoteRsp)(
+                self.api_ptr,
+                cstr_slice.as_ptr() as *mut *mut i8,
+                pp_instrument_id.len() as i32,
+            )
+        }
     }
-    
+
     /// 用户登录请求
-    pub fn req_user_login(&self, p_req_user_login_field: &mut CThostFtdcReqUserLoginField, n_request_id: i32) -> i32 {
+    pub fn req_user_login(
+        &self,
+        p_req_user_login_field: &mut CThostFtdcReqUserLoginField,
+        n_request_id: i32,
+    ) -> i32 {
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_ReqUserLogin)(self.api_ptr, p_req_user_login_field as *mut CThostFtdcReqUserLoginField, n_request_id)
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_ReqUserLogin)(
+                self.api_ptr,
+                p_req_user_login_field as *mut CThostFtdcReqUserLoginField,
+                n_request_id,
+            )
         }
     }
-    
+
     /// 登出请求
-    pub fn req_user_logout(&self, p_user_logout: &mut CThostFtdcUserLogoutField, n_request_id: i32) -> i32 {
+    pub fn req_user_logout(
+        &self,
+        p_user_logout: &mut CThostFtdcUserLogoutField,
+        n_request_id: i32,
+    ) -> i32 {
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_ReqUserLogout)(self.api_ptr, p_user_logout as *mut CThostFtdcUserLogoutField, n_request_id)
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_ReqUserLogout)(
+                self.api_ptr,
+                p_user_logout as *mut CThostFtdcUserLogoutField,
+                n_request_id,
+            )
         }
     }
-    
+
     /// 请求查询组播合约
-    pub fn req_qry_multicast_instrument(&self, p_qry_multicast_instrument: &mut CThostFtdcQryMulticastInstrumentField, n_request_id: i32) -> i32 {
+    pub fn req_qry_multicast_instrument(
+        &self,
+        p_qry_multicast_instrument: &mut CThostFtdcQryMulticastInstrumentField,
+        n_request_id: i32,
+    ) -> i32 {
         unsafe {
-            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_ReqQryMulticastInstrument)(self.api_ptr, p_qry_multicast_instrument as *mut CThostFtdcQryMulticastInstrumentField, n_request_id)
+            ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_ReqQryMulticastInstrument)(
+                self.api_ptr,
+                p_qry_multicast_instrument as *mut CThostFtdcQryMulticastInstrumentField,
+                n_request_id,
+            )
         }
     }
-    
 }
-    

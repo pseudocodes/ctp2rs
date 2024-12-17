@@ -136,10 +136,10 @@ impl Config {
 }
 
 pub type ParamVec = Vec<(String, String, String)>;
-pub type ItemVec = Vec<String>;
+pub type ItemVec = Vec<Vec<String>>;
 
 pub type ModuleHandler = dyn Fn(&Context, &Entity, &ItemVec) -> String;
-pub type FuncHandler = dyn Fn(&Context, &Entity, &ParamVec) -> String;
+pub type FuncHandler = dyn Fn(&Context, &Entity, &ParamVec) -> Vec<String>;
 pub type ParamHandler = dyn Fn(&Context, &str, &str, &TypeKind) -> (String, String, String);
 
 // type HandlerMap<'a> = HashMap<String, Box<MethodHandler<'a>>>;

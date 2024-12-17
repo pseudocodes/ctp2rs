@@ -55,45 +55,13 @@ impl MdApi {
     }
 }
 
-pub fn get_api_version_symbol<P: AsRef<Path>>(
-    dynlib_path: P,
-    symbol: &[u8],
-) -> Result<String, libloading::Error> {
-    let dynlib = unsafe { libloading::Library::new(dynlib_path.as_ref())? };
-    unsafe {
-        type GetApiVersion = unsafe extern "C" fn() -> *const c_char;
-        let get_api_version: libloading::Symbol<GetApiVersion> = dynlib.get(symbol)?;
-        let cstr_ptr = get_api_version();
-        let c_str: &CStr = CStr::from_ptr(cstr_ptr);
-        Ok(c_str.to_string_lossy().to_string())
-    }
-}
-
-pub fn get_api_version<P: AsRef<Path>>(dynlib_path: P) -> Result<String, libloading::Error> {
-    let md_symbol = MDAPI_GET_API_VERSION_SYMBOL;
-    let td_symbol = TDAPI_GET_API_VERSION_SYMBOL;
-
-    let dynlib = unsafe { libloading::Library::new(dynlib_path.as_ref())? };
-
-    // 尝试加载 MDAPI 符号
-    let _get_api_version = unsafe {
-        type GetApiVersion = unsafe extern "C" fn() -> *const c_char;
-
-        if let Ok(symbol) = dynlib.get::<GetApiVersion>(md_symbol) {
-            symbol
-        } else if let Ok(symbol) = dynlib.get::<GetApiVersion>(td_symbol) {
-            symbol
-        } else {
-            // 如果两个符号都加载失败，返回错误
-            return Err(libloading::Error::DlSymUnknown);
+impl Default for MdApi {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
         }
-    };
-
-    // 调用加载的符号函数并获取结果
-    unsafe {
-        let cstr_ptr = _get_api_version();
-        let c_str: &CStr = CStr::from_ptr(cstr_ptr);
-        Ok(c_str.to_string_lossy().to_string())
     }
 }
 
@@ -114,6 +82,8 @@ impl Drop for MdApi {
             if !self.api_ptr.is_null() {
                 ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Release)(self.api_ptr);
             }
+            let dynlib = self.dynlib.take();
+            let _ = dynlib.unwrap().close();
         }
     }
 }
@@ -199,7 +169,6 @@ impl MdApiBuilder {
 
 impl TraderApi {
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(dynlib_path: P, flow_path: F) -> Self {
-        // CThostFtdcMdApi_CreateFtdcMdApi(flow_path, is_using_udp, is_multicast)
         let dynlib =
             unsafe { libloading::Library::new(dynlib_path.as_ref()).expect("failed to open") };
         type TraderApiCreator = unsafe extern "C" fn(*const c_char) -> *mut CThostFtdcTraderApi;
@@ -231,6 +200,16 @@ impl TraderApi {
     }
 }
 
+impl Default for TraderApi {
+    fn default() -> Self {
+        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
+        unsafe {
+            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
+            s.assume_init()
+        }
+    }
+}
+
 impl Drop for TraderApi {
     fn drop(&mut self) {
         let spi_ptr = self.spi_ptr.get();
@@ -248,6 +227,50 @@ impl Drop for TraderApi {
             if !self.api_ptr.is_null() {
                 ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_Release)(self.api_ptr);
             }
+            let dynlib = self.dynlib.take();
+            let _ = dynlib.unwrap().close();
         }
+    }
+}
+
+pub fn get_api_version_symbol<P: AsRef<Path>>(
+    dynlib_path: P,
+    symbol: &[u8],
+) -> Result<String, libloading::Error> {
+    let dynlib = unsafe { libloading::Library::new(dynlib_path.as_ref())? };
+    unsafe {
+        type GetApiVersion = unsafe extern "C" fn() -> *const c_char;
+        let get_api_version: libloading::Symbol<GetApiVersion> = dynlib.get(symbol)?;
+        let cstr_ptr = get_api_version();
+        let c_str: &CStr = CStr::from_ptr(cstr_ptr);
+        Ok(c_str.to_string_lossy().to_string())
+    }
+}
+
+pub fn get_api_version<P: AsRef<Path>>(dynlib_path: P) -> Result<String, libloading::Error> {
+    let md_symbol = MDAPI_GET_API_VERSION_SYMBOL;
+    let td_symbol = TDAPI_GET_API_VERSION_SYMBOL;
+
+    let dynlib = unsafe { libloading::Library::new(dynlib_path.as_ref())? };
+
+    // 尝试加载 MDAPI 符号
+    let _get_api_version = unsafe {
+        type GetApiVersion = unsafe extern "C" fn() -> *const c_char;
+
+        if let Ok(symbol) = dynlib.get::<GetApiVersion>(md_symbol) {
+            symbol
+        } else if let Ok(symbol) = dynlib.get::<GetApiVersion>(td_symbol) {
+            symbol
+        } else {
+            // 如果两个符号都加载失败，返回错误
+            return Err(libloading::Error::DlSymUnknown);
+        }
+    };
+
+    // 调用加载的符号函数并获取结果
+    unsafe {
+        let cstr_ptr = _get_api_version();
+        let c_str: &CStr = CStr::from_ptr(cstr_ptr);
+        Ok(c_str.to_string_lossy().to_string())
     }
 }

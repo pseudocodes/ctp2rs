@@ -1,0 +1,17 @@
+[package]
+name = "insecure"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+libloading = "0.8.6"
+memchr = "2.7.4"
+
+ctp2rs = { path = "../../ctp-dyn/", optional = true }
+
+log = "0.4.22"
+dotenv = "0.15.0"
+env_logger = "0.11.5"
+
+[features]
+default = ["ctp2rs/default"]

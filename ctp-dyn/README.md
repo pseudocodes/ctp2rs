@@ -13,7 +13,7 @@ cargo add ctp2rs
 或者在 `Cargo.toml` 中添加
 ```toml
 [dependencies]
-ctp2rs = "0.1.0"
+ctp2rs = "0.1"
 # or below
 ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" } 
 ```
@@ -32,10 +32,10 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段
 ```toml
 [dependencies]
-ctp2rs = { version = "0.1.1", features = ["ctp_v6_7_7"] }
+ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] }
 ```
 
-
+当前存在可忽略版本加载动态库并运行的方案, Demo 可查看 [example/insecure](../examples/insecure/)，这可能是终极封装解决方案 
 
 * **基本样例**
 
@@ -60,6 +60,7 @@ cargo run --example <example>
 - [channel](../examples/channel/): 采用 channel 来获取行情，支持 MacOS 以及 Linux 
 - [localctp](../examples/localctp/): 运行 localctp 的一个样例，支持 Linux
 - [openctp](../examples/openctp): 连接 openctp 模拟平台的行情以及交易样例，支持 MacOS 以及 Linux 
+- [insecure](../examples/insecure): 可跨版本加载动态方案 POC Demo, 适用 Linux
   
 
 

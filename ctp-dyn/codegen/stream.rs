@@ -231,14 +231,19 @@ impl Stream for {spi_trait}Stream {{
 }}
     "#
     );
-
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
     format!(
         r#"{declare_code}
 impl {spi_trait} for {spi_trait}Stream {{ 
 {spi_code}
 }}
     "#,
-        spi_code = items.join("\n")
+        spi_code = method_data
     )
 }
 
@@ -248,7 +253,7 @@ macro_rules! indent {
     };
 }
 
-pub fn convert_stream_spi_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_stream_spi_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let method_call = e.get_name().unwrap();
     let method_name = match ctx.cfg.method_to_snake {
         true => rustify_method_name2(&method_call),
@@ -282,5 +287,5 @@ pub fn convert_stream_spi_trait_func_(ctx: &Context, e: &Entity, params: &ParamV
     }}"#,
         arg_list = arg_vec.join(", "),
     );
-    trait_method_code
+    vec![trait_method_code]
 }

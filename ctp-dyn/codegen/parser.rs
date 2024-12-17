@@ -95,7 +95,7 @@ pub fn traverse_ast(ctx: &mut Context, e: &Entity) -> String {
                             ctx.methods.get("_").unwrap()(ctx, m, &params)
                         }
                     })
-                    .collect::<Vec<String>>();
+                    .collect::<Vec<_>>();
                 // call module handler here
                 let module_handler = ctx.modules.get(&ctx.cfg.module_flavor).unwrap();
                 lines.push(module_handler(ctx, &c, &func_vec))
@@ -137,8 +137,15 @@ use crate::{version}::bindings::*;
 use crate::{version}::{spi_file}::*;    
 "#,
     );
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
     let api_trait_code = format!(
         r#"{header}
+#[derive(Debug)]
 pub struct {trait_name} {{
     pub api_ptr: *mut {api_class},
     pub spi_ptr: Cell<* mut {spi_name}Ext>,
@@ -152,24 +159,40 @@ impl {trait_name} {{
     {method_declare}
 }}
     "#,
-        method_declare = items.join("\n"),
+        method_declare = method_data,
     );
     api_trait_code
 }
 
 pub fn handle_module_spi_trait(ctx: &Context, e: &Entity, items: &ItemVec) -> String {
     let spi_trait = &ctx.cfg.generate_trait_name;
+
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
+
     let spi_trait_code = format!(
         r#"
 pub trait {spi_trait}: Send {{{method_code}
 }}"#,
-        method_code = items.join("\n"),
+        method_code = method_data,
     );
     spi_trait_code
 }
 
 pub fn handle_module_vtable_struct(ctx: &Context, e: &Entity, items: &ItemVec) -> String {
     let trait_name = &ctx.cfg.generate_trait_name;
+
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
+
     let vtable_func_code = format!(
         r#"
 #[repr(C)]
@@ -177,7 +200,7 @@ pub fn handle_module_vtable_struct(ctx: &Context, e: &Entity, items: &ItemVec) -
 pub struct {trait_name}VTable {{
 {fn_declare_list}
 }}"#,
-        fn_declare_list = items.join("\n")
+        fn_declare_list = method_data
     );
     vtable_func_code
 }
@@ -185,6 +208,14 @@ pub struct {trait_name}VTable {{
 pub fn handle_module_static_table(ctx: &Context, e: &Entity, items: &ItemVec) -> String {
     let source_class = &ctx.cfg.source_class_name;
     let trait_name = &ctx.cfg.generate_trait_name;
+
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
+
     let static_table_code = format!(
         r#"
 static SPI_VTABLE: {trait_name}VTable = {trait_name}VTable {{
@@ -207,18 +238,33 @@ impl {source_class}Ext {{
     }}
 }}
 "#,
-        fn_member_list = items.join("\n")
+        fn_member_list = method_data
     );
     static_table_code
 }
 
 pub fn handle_module_extern_cfn(ctx: &Context, e: &Entity, items: &ItemVec) -> String {
-    let spi_cfunc_code = format!(r#"{spi_funcs}"#, spi_funcs = items.join("\n"),);
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
+
+    let spi_cfunc_code = format!(r#"{spi_funcs}"#, spi_funcs = method_data,);
     spi_cfunc_code
 }
 
 pub fn handle_module_event_enum(ctx: &Context, e: &Entity, items: &ItemVec) -> String {
     let spi_trait = &ctx.cfg.generate_trait_name;
+
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
+
     let event_enum_code = format!(
         r#"
 #[derive(Clone, Debug)]
@@ -226,13 +272,19 @@ pub enum {spi_trait}Event {{
 {event_enums}
 }}
     "#,
-        event_enums = items.join("\n")
+        event_enums = method_data
     );
     event_enum_code
 }
 
 pub fn handle_module_event_struct(ctx: &Context, e: &Entity, items: &ItemVec) -> String {
-    items.join("\n")
+    let method_data = items
+        .iter()
+        .filter(|x| !x[0].is_empty())
+        .map(|x| x[0].as_str())
+        .collect::<Vec<_>>()
+        .join("\n");
+    method_data
 }
 
 pub fn _convert_api_registerspi_func(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
@@ -325,7 +377,6 @@ pub fn _convert_api_incomplete_array_func(ctx: &Context, e: &Entity, params: &Pa
             format!("self as *mut {}", ctx.cfg.source_class_name),
         )
     };
-
     let api_class = &ctx.cfg.source_class_name;
     let (arg_0_name, arg_0_type, param_0_call) = (&params[0]);
     let args_text = format!("{self_text}, {arg_0_name}: {arg_0_type}");
@@ -508,11 +559,11 @@ pub fn _convert_api_general_func(ctx: &Context, e: &Entity, params: &ParamVec) -
     )
 }
 
-pub fn convert_api_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_api_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let func_name = e.get_name().unwrap();
 
     if func_name.contains("Subscribe") && params[0].1.contains("Vec") {
-        return _convert_api_incomplete_array_func(ctx, e, params);
+        return vec![_convert_api_incomplete_array_func(ctx, e, params)];
     }
 
     let func_code = match func_name.as_str() {
@@ -520,10 +571,10 @@ pub fn convert_api_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> 
         "RegisterSpi" => _convert_api_registerspi_func(ctx, e, params),
         _ => _convert_api_general_func(ctx, e, params),
     };
-    func_code
+    vec![func_code]
 }
 
-pub fn convert_spi_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_spi_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let method_call = e.get_name().unwrap();
     let method_name = match ctx.cfg.method_to_snake {
         true => rustify_method_name2(&method_call),
@@ -551,10 +602,10 @@ pub fn convert_spi_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> 
     }}"#,
         arg_list = arg_vec.join(", "),
     );
-    trait_method_code
+    vec![trait_method_code]
 }
 
-pub fn convert_spi_vtable_struct_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_spi_vtable_struct_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let method_call = e.get_name().unwrap();
     let method_name = match ctx.cfg.method_to_snake {
         true => rustify_method_name2(&method_call),
@@ -572,10 +623,10 @@ pub fn convert_spi_vtable_struct_(ctx: &Context, e: &Entity, params: &ParamVec) 
         r#"    {method_name}: unsafe extern "C" fn({}),"#,
         arg_vec.join(", ")
     );
-    vtable_func_code
+    vec![vtable_func_code]
 }
 
-pub fn convert_spi_static_vtable_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_spi_static_vtable_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let method_call = e.get_name().unwrap();
     let method_name = match ctx.cfg.method_to_snake {
         true => rustify_method_name2(&method_call),
@@ -583,10 +634,10 @@ pub fn convert_spi_static_vtable_(ctx: &Context, e: &Entity, params: &ParamVec) 
     };
 
     let vtable_func_code = format!(r#"    {method_name}: spi_{method_name},"#,);
-    vtable_func_code
+    vec![vtable_func_code]
 }
 
-pub fn convert_spi_cfunc_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_spi_cfunc_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let method_call = e.get_name().unwrap();
     let method_name = match ctx.cfg.method_to_snake {
         true => rustify_method_name2(&method_call),
@@ -614,17 +665,17 @@ extern "C" fn spi_{method_name}({}) {{
 }}"#,
         arg_vec.join(", ")
     );
-    spi_cfunc_code
+    vec![spi_cfunc_code]
 }
 
-pub fn convert_spi_event_enum_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_spi_event_enum_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let trait_name = &ctx.cfg.wrap_spi_trait;
     let method_call = e.get_name().unwrap();
     let event_enum_entry = format!("    {method_call}({trait_name}{method_call}Event),");
-    event_enum_entry
+    vec![event_enum_entry]
 }
 
-pub fn convert_spi_event_struct_(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+pub fn convert_spi_event_struct_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let trait_name = &ctx.cfg.wrap_spi_trait;
     let method_call = e.get_name().unwrap();
     let (to_snake, trim_prefix) = (&ctx.cfg.param_to_snake, &ctx.cfg.param_trim_prefix);
@@ -636,13 +687,14 @@ pub fn convert_spi_event_struct_(ctx: &Context, e: &Entity, params: &ParamVec) -
         })
         .collect::<Vec<_>>()
         .join("\n");
-    format!(
+    let v = format!(
         r#"
 #[derive(Clone, Debug)]
 pub struct {trait_name}{method_call}Event {{
 {event_entries}
 }}"#,
-    )
+    );
+    vec![v]
 }
 
 pub fn convert_param_type(ctx: &Context, e: &Entity) -> (String, String, String) {
