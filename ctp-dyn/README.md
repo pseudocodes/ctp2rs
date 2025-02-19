@@ -1,6 +1,6 @@
 # Ctp2rs
 
-采用 `libloading` 加载 `ctp/ctp-mini` 动态库的 CTP API 的 Rust 绑定封装
+采用 `libloading` 加载 `ctp/ctp-mini/ctp-sopt` 动态库的 CTP API 的 Rust 绑定封装
 历史项目 `ctp-dyn`
 
 
@@ -27,6 +27,8 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 | ctp v6.7.7      | ctp_v6_7_7  | x     | x     |         |
 | ctp v6.7.8      | ctp_v6_7_8  | x     |       |         |
 | ctp-mini v1.6.9 | mini_v1_6_9 | x     |       |         |
+| ctp-mini v1.7.0 | mini_v1_7_0 | x     |       |         |
+| ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       |         |
 
 
 实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段
