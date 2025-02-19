@@ -11,10 +11,31 @@ use crate::v1alpha1::MdApi;
 use crate::v1alpha1::TraderApi;
 use crate::v1alpha1::{CThostFtdcMdApi, CThostFtdcTraderApi};
 
+#[cfg(not(feature = "sopt"))]
 pub const MDAPI_CREATE_API_SYMBOL: &[u8] = b"_ZN15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb";
-pub const TDAPI_CREATE_API_SYMBOL: &[u8] = b"_ZN19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc";
+
+#[cfg(not(feature = "sopt"))]
 pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN15CThostFtdcMdApi13GetApiVersionEv";
+
+#[cfg(not(feature = "sopt"))]
+pub const TDAPI_CREATE_API_SYMBOL: &[u8] = b"_ZN19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc";
+
+#[cfg(not(feature = "sopt"))]
 pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN19CThostFtdcTraderApi13GetApiVersionEv";
+
+#[cfg(feature = "sopt")]
+pub const MDAPI_CREATE_API_SYMBOL: &[u8] = b"_ZN8ctp_sopt15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb";
+
+#[cfg(feature = "sopt")]
+pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN8ctp_sopt15CThostFtdcMdApi13GetApiVersionEv";
+
+#[cfg(feature = "sopt")]
+pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
+    b"_ZN8ctp_sopt19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc";
+
+#[cfg(feature = "sopt")]
+pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] =
+    b"_ZN8ctp_sopt19CThostFtdcTraderApi13GetApiVersionEv";
 
 impl MdApi {
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(

@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased] - 2025-02-19
+
+### Changed
+
+- 更新支持 ctp-mini v1.7.0 Linux 版
+- 更新支持 ctp-sopt v3.7.3 Linux 版
+- 更新 build.rs 
+- Readme 更新
+- 版本升级 0.1.4 
+
 ## [Unreleased] - 2024-12-13
 
 ### Changed

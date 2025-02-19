@@ -22,6 +22,14 @@ fn get_sdk_path() -> &'static std::path::Path {
         return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_linux64_api_20240527/");
     }
 
+    if cfg!(feature = "mini_v1_7_0") {
+        return Path::new("./api/mini/v1.7.0/CTPIIMini_V1.7.0_linux64_api_20240923/");
+    }
+
+    if cfg!(feature = "sopt_v3_7_3") {
+        return Path::new("./api/ctpsopt/v3.7.3/v3.7.3_20240910_api_traderapi_linux64_se/");
+    }
+
     if cfg!(feature = "ctp_v6_7_7") {
         if cfg!(feature = "openctp") {
             panic!("`openctp` feature not supported for `v6_7_7`.");
@@ -111,6 +119,7 @@ fn build_dyn() {
         .clang_arg("c++")
         .rustified_enum(".*")
         .vtable_generation(true)
+        .disable_name_namespacing()
         .derive_default(true)
         .derive_debug(true)
         .derive_copy(true)

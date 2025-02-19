@@ -105,7 +105,11 @@ pub fn traverse_ast(ctx: &mut Context, e: &Entity) -> String {
             if c.get_kind() == EntityKind::ParmDecl {
                 println!("{:?}", c);
             }
-            EntityVisitResult::Continue
+            if cfg!(feature = "sopt") {
+                EntityVisitResult::Recurse
+            } else {
+                EntityVisitResult::Continue
+            }
         }
     });
     lines.join("")
