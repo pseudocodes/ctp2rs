@@ -273,7 +273,7 @@ fn main() {
         panic!("Only support for Linux! ")
     }
     let dynlib_path =
-        "../../ctp-dyn/api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thosttraderapi_se.so";
+        "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thosttraderapi_se.so";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
 

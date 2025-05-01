@@ -108,7 +108,7 @@ pub fn run_channel_md() {
     println!("base_dir: {base_dir}");
     #[cfg(target_os = "macos")]
     let dynlib_path =
-        "../../ctp-dyn/api/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se";
+        "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se";
 
     #[cfg(target_os = "linux")]
     let dynlib_path =
@@ -153,7 +153,7 @@ pub fn run_channel_md() {
     match rx.recv_timeout(std::time::Duration::from_secs(5)) {
         Err(_) => error!("Timeout try recv `req_user_login`"),
         Ok(MdSpiEvent::OnRspUserLogin(rsp)) => {
-            let instrument_ids = vec!["ag2502".to_string(), "fu2505".to_string()];
+            let instrument_ids = vec!["ag2508".to_string(), "fu2505".to_string()];
             mdapi.subscribe_market_data(&instrument_ids);
         }
         Ok(event) => {
