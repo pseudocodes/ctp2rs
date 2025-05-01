@@ -18,10 +18,10 @@ cargo add ctp2rs
 ## Usage 
 ```rust
 #[cfg(target_os = "macos")]
-let dynlib_path = "../../ctp-dyn/api/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se";
+let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se";
 
 #[cfg(target_os = "linux")]
-let dynlib_path = "../../ctp-dyn/api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
+let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
 
 let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false);
 ...    

@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased] - 2025-05-01
+
+### Changed
+
+- 更新添加 6.7.9 对应官方 CTP 库 Linux 版本
+- 更新 build.rs 
+- Readme 更新
+- 版本升级 0.1.5
+
+
 ## [Unreleased] - 2025-02-19
 
 ### Changed

@@ -54,6 +54,18 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
+    if cfg!(feature = "ctp_v6_7_9") {
+        if cfg!(feature = "openctp") {
+            panic!("`openctp` feature not supported for `v6_7_9`.");
+        }
+        if cfg!(target_os = "macos") {
+            panic!("`macOS platform` not supported for `v6_7_9`.");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.9/v6.7.9_P1_20250319_api_traderapi_se_linux64/");
+        }
+    }
+
     if cfg!(feature = "ctp_v6_7_2") {
         if cfg!(feature = "openctp") {
             return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");

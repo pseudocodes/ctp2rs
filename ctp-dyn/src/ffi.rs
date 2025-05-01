@@ -117,6 +117,22 @@ impl<const N: usize> AssignFromString for &mut [i8; N] {
     }
 }
 
+pub trait SetString {
+    fn set_str(&mut self, s: &str);
+}
+
+impl<const N: usize> SetString for [i8; N] {
+    fn set_str(&mut self, s: &str) {
+        copy_str_to_i8_array(self, s);
+    }
+}
+
+impl<const N: usize> SetString for &mut [i8; N] {
+    fn set_str(&mut self, s: &str) {
+        copy_str_to_i8_array(*self, s);
+    }
+}
+
 pub trait WrapToString {
     fn to_string(&self) -> String;
 }

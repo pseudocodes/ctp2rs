@@ -26,6 +26,7 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 | ctp v6.7.2      | ctp_v6_7_2  | x     | x     |         |
 | ctp v6.7.7      | ctp_v6_7_7  | x     | x     |         |
 | ctp v6.7.8      | ctp_v6_7_8  | x     |       |         |
+| ctp v6.7.9      | ctp_v6_7_9  | x     |       |         |
 | ctp-mini v1.6.9 | mini_v1_6_9 | x     |       |         |
 | ctp-mini v1.7.0 | mini_v1_7_0 | x     |       |         |
 | ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       |         |
@@ -37,16 +38,16 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] }
 ```
 
-当前存在可忽略版本加载动态库并运行的方案, Demo 可查看 [example/insecure](../examples/insecure/)，这可能是终极封装解决方案 
+当前已实现动态链接库的无版本依赖加载方案, Demo 可查看 [example/insecure](../examples/insecure/)，这可能是跨版本兼容封装的极限解决方案 
 
 * **基本样例**
 
 ```rust
 #[cfg(target_os = "macos")]
-let dynlib_path = "../../ctp-dyn/api/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se";
+let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se";
 
 #[cfg(target_os = "linux")]
-let dynlib_path = "../../ctp-dyn/api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
+let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
 
 let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false);
 ...    
@@ -80,6 +81,7 @@ cargo run --example <example>
 |8| ctp-sys | [https://github.com/daedalus2022/ctp-sys](https://github.com/daedalus2022/ctp-sys) |[ctp-sys](https://crates.io/crates/ctp-sys)| Win64/Linux| rust-share 的分支实现 |
 |9| ctp-futures|[github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)|[ctp-futures](https://crates.io/crates/ctp-futures)| Win64/Linux |rust-share 的分支实现 |
 |10| localctp-sys| [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)|[localctp-sys](https://crates.io/crates/localctp-sys)| Win64/Linux| rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本|
+|11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|N/A| Linux| `1` 分支实现|
 
 
 ### Potential Issues
@@ -109,6 +111,9 @@ g++ (Ubuntu 11.2.0-19ubuntu1) 11.2.0
 > rustc --version
 rustc 1.77.2 (25ef9e3d8 2024-04-09)
 ```
+### Project Dissection
+
+See **[DeepWiki](https://deepwiki.com/pseudocodes/ctp2rs)**
 
 ## Notice
 自动生成代码在构建中移入 `OUT_DIR` 目录, 项目中保留的文件实际不参与编译构建，仅作为参考展示
