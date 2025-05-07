@@ -1,3 +1,5 @@
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pseudocodes/ctp2rs)
+
 # Ctp2rs
 上海期货信息技术公司 CTP/CTP-Mini/CTP-Sopt 接口 rust 语言原生封装
 
@@ -35,6 +37,12 @@ See [/examples](./examples) for various uses of Ctp2rs. You can run them with:
 ```sh
 cargo run --example <example>
 ```
+### open-md-gateway
+
+一个多源行情网关的实现 [open-md-gateway](https://github.com/pseudocodes/open-md-gateway)
+
+通过对 [QAMD Gateway](https://github.com/QUANTAXIS/qautlra-rs/tree/master/qamdgateway) 进行重构，简化对 `ctp` 库的依赖和构建
+
 
 ## Associative Project
 

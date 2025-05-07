@@ -65,7 +65,11 @@ cargo run --example <example>
 - [openctp](../examples/openctp): 连接 openctp 模拟平台的行情以及交易样例，支持 MacOS 以及 Linux 
 - [insecure](../examples/insecure): 可跨版本加载动态方案 POC Demo, 适用 Linux
   
+### open-md-gateway
 
+一个多源行情网关的实现 [open-md-gateway](https://github.com/pseudocodes/open-md-gateway)
+
+通过对 [QAMD Gateway](https://github.com/QUANTAXIS/qautlra-rs/tree/master/qamdgateway) 进行重构，简化对 `ctp` 库的依赖和构建
 
 
 ## Related Projects
@@ -81,7 +85,7 @@ cargo run --example <example>
 |8| ctp-sys | [https://github.com/daedalus2022/ctp-sys](https://github.com/daedalus2022/ctp-sys) |[ctp-sys](https://crates.io/crates/ctp-sys)| Win64/Linux| rust-share 的分支实现 |
 |9| ctp-futures|[github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)|[ctp-futures](https://crates.io/crates/ctp-futures)| Win64/Linux |rust-share 的分支实现 |
 |10| localctp-sys| [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)|[localctp-sys](https://crates.io/crates/localctp-sys)| Win64/Linux| rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本|
-|11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|N/A| Linux| `1` 分支实现|
+|11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|[rptx](https://crates.io/crates/rtpx)| Linux| `1` 分支实现, 仅实现了 TraderApi 绑定|
 
 
 ### Potential Issues

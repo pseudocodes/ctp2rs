@@ -1,6 +1,6 @@
 # Insecure
 
-这是一个 **POC (Proof of Concept) Demo** ，用来探索展示如何利用 `CTP API` 的向后兼容性进行无视版本的动态库加载封装方法
+这是一个 **POC (Proof of Concept) Demo** ，用来展示如何利用 `CTP API` 的向后兼容性进行跨版本动态库加载的封装方法
 
 **原理:**
 

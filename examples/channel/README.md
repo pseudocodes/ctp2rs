@@ -1,6 +1,6 @@
 # Channel Sample 
 
-用 channel 来实现的行情 sample 
+使用 channel 来实现行情获取的 sample 
 
 ## Run
 ```shell
