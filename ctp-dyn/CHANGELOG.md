@@ -1,5 +1,25 @@
 # Changelog
 
+## [Unreleased] - 2025-05-19
+
+### Changed
+
+- 增加对环境变量 `CTP_API_INCLUDE_DIR` 的支持，方便开发者构建项目时替换不同版本的 CTP 头文件
+- 更新 build.rs 
+- 若 API 依赖路径不存在 `error.xml`, 则不会提供 `CtpError` 支持
+- Readme 更新
+- 版本号升级至 0.1.7-alpha1
+
+## [Unreleased] - 2025-05-11
+
+### Changed
+
+- 添加对 `error.xml` 的解析，生成 `CtpError` 封装
+- 更新 build.rs 
+- Readme 更新
+- 版本号升级至 0.1.6
+
+
 ## [Unreleased] - 2025-05-01
 
 ### Changed
@@ -7,7 +27,7 @@
 - 更新添加 6.7.9 对应官方 CTP 库 Linux 版本
 - 更新 build.rs 
 - Readme 更新
-- 版本升级 0.1.5
+- 版本号升级至 0.1.5
 
 
 ## [Unreleased] - 2025-02-19
@@ -18,7 +38,7 @@
 - 更新支持 ctp-sopt v3.7.3 Linux 版
 - 更新 build.rs 
 - Readme 更新
-- 版本升级 0.1.4 
+- 版本号升级至 0.1.4 
 
 ## [Unreleased] - 2024-12-13
 

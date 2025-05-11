@@ -7,9 +7,7 @@ use std::ptr::null_mut;
 
 use libloading::Library;
 
-use crate::v1alpha1::MdApi;
-use crate::v1alpha1::TraderApi;
-use crate::v1alpha1::{CThostFtdcMdApi, CThostFtdcTraderApi};
+use crate::v1alpha1::{CThostFtdcMdApi, CThostFtdcTraderApi, MdApi, TraderApi};
 
 #[cfg(not(feature = "sopt"))]
 mod symbols {
