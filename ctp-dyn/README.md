@@ -1,4 +1,10 @@
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pseudocodes/ctp2rs)
+
+[![Ask DeepWiki]][deepwiki] [![Crates.io Version]][crates.io]
+
+[Crates.io Version]: https://img.shields.io/crates/v/ctp2rs
+[crates.io]: https://crates.io/crates/ctp2rs
+[Ask DeepWiki]: https://deepwiki.com/badge.svg
+[deepwiki]: https://deepwiki.com/pseudocodes/ctp2rs
 
 # Ctp2rs
 
@@ -34,7 +40,7 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 | ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       |         |
 
 
-实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段
+实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段，或开发者可以采用环境变量来指定具体绑定的 CTP API 版本
 ```toml
 [dependencies]
 ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] }
@@ -42,15 +48,14 @@ ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] }
 
 当前已实现动态链接库的无版本依赖加载方案, Demo 可查看 [example/insecure](../examples/insecure/)，这可能是跨版本兼容封装的极限解决方案 
 
-* **构建时替换版本**
+* **环境变量动态依赖构建**
 
-通过环境变量 `CTP_API_INCLUDE_DIR` 可以指定项目所依赖的 CTP API 版本，有以下约定
+通过环境变量 `CTP_API_INCLUDE_DIR` 可以在构建项目时指定所依赖的 CTP API 版本，有以下约定
   * 环境变量一般设定为绝对路径, 或者以当前构建目录为基准的相对路径
   * 指定的依赖目录里的头文件或者 `error.xml` 需要转码至 `UTF8`
-  * 使用环境变量需要开启 `--features "envpath"` 若此时环境变量不可用则采用 default 中的配置进行构建
-
+  
 ```shell
-> CTP_API_INCLUDE_DIR=/absolute/path/to/your/ctp/api/ cargo build --features "envpath"
+> CTP_API_INCLUDE_DIR=/absolute/path/to/your/ctp/api/ cargo build 
 ```
 
 * **基本样例**

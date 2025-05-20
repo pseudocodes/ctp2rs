@@ -1,4 +1,9 @@
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/pseudocodes/ctp2rs)
+[![Ask DeepWiki]][deepwiki] [![Crates.io Version]][crates.io]
+
+[Crates.io Version]: https://img.shields.io/crates/v/ctp2rs
+[crates.io]: https://crates.io/crates/ctp2rs
+[Ask DeepWiki]: https://deepwiki.com/badge.svg
+[deepwiki]: https://deepwiki.com/pseudocodes/ctp2rs
 
 # Ctp2rs
 上海期货信息技术公司 CTP/CTP-Mini/CTP-Sopt 接口 rust 语言原生封装

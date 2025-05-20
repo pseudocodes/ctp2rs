@@ -1,4 +1,5 @@
 #![allow(unused_variables, unused_macros, unreachable_code)]
+use std::env;
 use std::env::var;
 
 use std::fs;
@@ -101,7 +102,7 @@ fn build_dyn() {
     let generate_dir = source_dir.join(version);
     let _ = ensure_dir_exists(&generate_dir);
 
-    let sdk_path = if cfg!(feature = "envpath") {
+    let sdk_path = if env::var("CTP_API_INCLUDE_DIR").is_ok() {
         println!("cargo:rerun-if-env-changed=CTP_API_INCLUDE_DIR");
         get_ctp_include_path().unwrap_or_else(|e| {
             p!(
