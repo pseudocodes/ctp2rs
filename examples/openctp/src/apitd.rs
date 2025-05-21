@@ -137,6 +137,8 @@ pub fn run_td() {
     let dynlib_path = "./tts/v6_7_2/mac_arm64/thosttraderapi_se.dylib";
     #[cfg(target_os = "linux")]
     let dynlib_path = "./tts/v6_7_2/lin64/thosttraderapi_se.so";
+    #[cfg(target_os = "windows")]
+    let dynlib_path = "./tts/v6_7_2/win64/thosttraderapi_se.dll";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
 
