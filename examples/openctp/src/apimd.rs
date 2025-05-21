@@ -34,7 +34,7 @@ impl MdSpi for BaseMdSpi {
         println!("on_rsp_user_login!");
 
         if is_last {
-            let instrument_ids = vec!["ag2502".to_string(), "fu2505".to_string()];
+            let instrument_ids = vec!["ag2507".to_string(), "ag2508".to_string()];
             self.mdapi.subscribe_market_data(&instrument_ids);
         }
     }
@@ -86,6 +86,9 @@ pub fn run_md() {
 
     #[cfg(target_os = "linux")]
     let dynlib_path = "./tts/v6_7_2/lin64/thostmduserapi_se.so";
+
+    #[cfg(target_os = "windows")]
+    let dynlib_path = "./tts/v6_7_2/win64/thostmduserapi_se.dll";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
     println!("dynlib_path: {}", dynlib_path.as_path().to_string_lossy());
