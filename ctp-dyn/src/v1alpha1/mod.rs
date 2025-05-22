@@ -37,3 +37,5 @@ pub mod stream {
     include!(concat!(env!("OUT_DIR"), "/stream.rs"));
 }
 pub use stream::*;
+
+include!(concat!(env!("OUT_DIR"), "/mod.rs"));

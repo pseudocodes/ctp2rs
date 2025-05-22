@@ -1,3 +1,11 @@
+
+[![Ask DeepWiki]][deepwiki] [![Crates.io Version]][crates.io]
+
+[Crates.io Version]: https://img.shields.io/crates/v/ctp2rs
+[crates.io]: https://crates.io/crates/ctp2rs
+[Ask DeepWiki]: https://deepwiki.com/badge.svg
+[deepwiki]: https://deepwiki.com/pseudocodes/ctp2rs
+
 # Ctp2rs
 
 采用 `libloading` 加载 `ctp/ctp-mini/ctp-sopt` 动态库的 CTP API 的 Rust 绑定封装
@@ -22,23 +30,35 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 
 已加入项目的 CTP 柜台版本
 | version         | feature     | Linux | macOS | Windows |
-| :-------------- | ----------- | ----- | ----- | :------ |
-| ctp v6.7.2      | ctp_v6_7_2  | x     | x     |         |
-| ctp v6.7.7      | ctp_v6_7_7  | x     | x     |         |
-| ctp v6.7.8      | ctp_v6_7_8  | x     |       |         |
-| ctp v6.7.9      | ctp_v6_7_9  | x     |       |         |
-| ctp-mini v1.6.9 | mini_v1_6_9 | x     |       |         |
-| ctp-mini v1.7.0 | mini_v1_7_0 | x     |       |         |
-| ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       |         |
+| :-------------- | ----------- | ----- | ----- | ------- |
+| ctp v6.7.2      | ctp_v6_7_2  | x     | x     |   x     |
+| ctp v6.7.7      | ctp_v6_7_7  | x     | x     |   x     |
+| ctp v6.7.8      | ctp_v6_7_8  | x     |       |   x     |
+| ctp v6.7.9      | ctp_v6_7_9  | x     |       |   x     |
+| ctp-mini v1.6.9 | mini_v1_6_9 | x     |       |   x     |
+| ctp-mini v1.7.0 | mini_v1_7_0 | x     |       |   x     |
+| ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       |   x     |
 
 
-实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段
+实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段，或开发者可以采用环境变量来指定具体绑定的 CTP API 版本
+另 `0.1.7` 版本后将不再在项目中跟踪保存 CTP 各版本头文件，视情况添加 `MINOR` 版本的更新
+
 ```toml
 [dependencies]
 ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] }
 ```
 
 当前已实现动态链接库的无版本依赖加载方案, Demo 可查看 [example/insecure](../examples/insecure/)，这可能是跨版本兼容封装的极限解决方案 
+
+* **环境变量动态依赖构建**
+
+通过环境变量 `CTP_API_INCLUDE_DIR` 可以在构建项目时指定所依赖的 CTP API 版本，有以下约定
+  * 环境变量一般设定为绝对路径, 或者以当前构建目录为基准的相对路径
+  * 指定的依赖目录里的头文件或者 `error.xml` 需要转码至 `UTF8`
+  
+```shell
+> CTP_API_INCLUDE_DIR=/absolute/path/to/your/ctp/api/ cargo build 
+```
 
 * **基本样例**
 
@@ -48,6 +68,9 @@ let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_MacOS_20231016/thostmduse
 
 #[cfg(target_os = "linux")]
 let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
+
+#[cfg(target_os = "windows")]
+let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi64_se_windows/thostmduserapi_se.dll"
 
 let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false);
 ...    
@@ -115,12 +138,21 @@ g++ (Ubuntu 11.2.0-19ubuntu1) 11.2.0
 > rustc --version
 rustc 1.77.2 (25ef9e3d8 2024-04-09)
 ```
-### Project Dissection
-
-See **[DeepWiki](https://deepwiki.com/pseudocodes/ctp2rs)**
+* **Windows**
+```shell
+> clang -v
+clang version 18.1.8
+Target: x86_64-pc-windows-msvc
+Thread model: posix
+> rustc --version
+rustc 1.87.0 (17067e9ac 2025-05-09)
+```
 
 ## Notice
 自动生成代码在构建中移入 `OUT_DIR` 目录, 项目中保留的文件实际不参与编译构建，仅作为参考展示
+
+## Acknowledgments 
+[@ZerounNet](https://github.com/ZerounNet): Windows 开发环境适配
 
 ## Reference 
 

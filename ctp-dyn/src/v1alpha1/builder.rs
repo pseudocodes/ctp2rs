@@ -7,11 +7,9 @@ use std::ptr::null_mut;
 
 use libloading::Library;
 
-use crate::v1alpha1::MdApi;
-use crate::v1alpha1::TraderApi;
-use crate::v1alpha1::{CThostFtdcMdApi, CThostFtdcTraderApi};
+use crate::v1alpha1::{CThostFtdcMdApi, CThostFtdcTraderApi, MdApi, TraderApi};
 
-#[cfg(not(feature = "sopt"))]
+#[cfg(all(not(feature = "sopt"), not(target_os = "windows")))]
 mod symbols {
     pub const MDAPI_CREATE_API_SYMBOL: &[u8] = b"_ZN15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb";
     pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN15CThostFtdcMdApi13GetApiVersionEv";
@@ -19,7 +17,17 @@ mod symbols {
     pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN19CThostFtdcTraderApi13GetApiVersionEv";
 }
 
-#[cfg(feature = "sopt")]
+#[cfg(all(not(feature = "sopt"), target_os = "windows"))]
+mod symbols {
+    pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
+        b"?CreateFtdcMdApi@CThostFtdcMdApi@@SAPEAV1@PEBD_N1@Z";
+    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"?GetApiVersion@CThostFtdcMdApi@@SAPEBDXZ";
+    pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
+        b"?CreateFtdcTraderApi@CThostFtdcTraderApi@@SAPEAV1@PEBD@Z";
+    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"?GetApiVersion@CThostFtdcTraderApi@@SAPEBDXZ";
+}
+
+#[cfg(all(feature = "sopt", not(target_os = "windows")))]
 mod symbols {
     pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
         b"_ZN8ctp_sopt15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb";
@@ -29,6 +37,18 @@ mod symbols {
         b"_ZN8ctp_sopt19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc";
     pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] =
         b"_ZN8ctp_sopt19CThostFtdcTraderApi13GetApiVersionEv";
+}
+
+#[cfg(all(feature = "sopt", target_os = "windows"))]
+mod symbols {
+    pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
+        b"?CreateFtdcMdApi@CThostFtdcMdApi@ctp_sopt@@SAPEAV12@PEBD_N1@Z";
+    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] =
+        b"?GetApiVersion@CThostFtdcMdApi@ctp_sopt@@SAPEBDXZ";
+    pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
+        b"?CreateFtdcTraderApi@CThostFtdcTraderApi@ctp_sopt@@SAPEAV12@PEBD@Z";
+    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] =
+        b"?GetApiVersion@CThostFtdcTraderApi@ctp_sopt@@SAPEBDXZ";
 }
 
 pub use symbols::*;

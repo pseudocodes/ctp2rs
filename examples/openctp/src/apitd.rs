@@ -31,7 +31,7 @@ impl TraderSpi for BaseTraderSpi {
     }
 
     fn on_front_disconnected(&mut self, n_reason: i32) {
-        println!("on_front_disconnected: reason{n_reason}")
+        println!("on_front_disconnected: reason -> {n_reason}")
     }
 
     fn on_heart_beat_warning(&mut self, n_time_lapse: i32) {}
@@ -137,8 +137,14 @@ pub fn run_td() {
     let dynlib_path = "./tts/v6_7_2/mac_arm64/thosttraderapi_se.dylib";
     #[cfg(target_os = "linux")]
     let dynlib_path = "./tts/v6_7_2/lin64/thosttraderapi_se.so";
+    #[cfg(target_os = "windows")]
+    let dynlib_path = "./tts/v6_7_2/win64/thosttraderapi_se.dll";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
+    println!(
+        "td dynlib_path: {}",
+        dynlib_path.as_path().to_string_lossy()
+    );
 
     let tdapi = TraderApi::create_api(dynlib_path.as_path(), "./td_");
     let tdapi = Arc::new(tdapi);
@@ -149,7 +155,7 @@ pub fn run_td() {
     let tdspi_box = Box::new(base_tdspi);
     let tdspi_ptr = Box::into_raw(tdspi_box);
     let tdspi_ptr2 = tdspi_ptr.clone();
-    println!("get_api_version: {}", tdapi.get_api_version());
+    println!("td get_api_version: {}", tdapi.get_api_version());
 
     tdapi.register_front("tcp://121.37.80.177:20004"); // tts 7x24 td
 
