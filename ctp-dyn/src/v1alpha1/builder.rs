@@ -42,7 +42,7 @@ mod symbols {
 #[cfg(all(feature = "sopt", target_os = "windows"))]
 mod symbols {
     pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
-        b"?CreateFtdcMdApi@CThostFtdcMdApi@ctp_sopt@@SAPEAV12@PEBD_N1@";
+        b"?CreateFtdcMdApi@CThostFtdcMdApi@ctp_sopt@@SAPEAV12@PEBD_N1@Z";
     pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] =
         b"?GetApiVersion@CThostFtdcMdApi@ctp_sopt@@SAPEBDXZ";
     pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
