@@ -252,7 +252,7 @@ version = "0.1.0"
 
 [[package]]
 name = "ctp2rs"
-version = "0.1.7-alpha3"
+version = "0.1.7"
 dependencies = [
  "Inflector",
  "bindgen",
@@ -855,6 +855,13 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "tts_sopt"
+version = "0.1.0"
+dependencies = [
+ "ctp2rs",
 ]
 
 [[package]]
