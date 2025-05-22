@@ -104,7 +104,7 @@ pub fn run_md() {
         mdapi: Arc::clone(&mdapi),
     };
     let mdspi_box = Box::new(base_mdspi);
-    println!("get_api_version: {}", mdapi.get_api_version());
+    println!("md get_api_version: {}", mdapi.get_api_version());
 
     mdapi.register_front("tcp://121.37.80.177:20004"); // tts 7x24 md
 

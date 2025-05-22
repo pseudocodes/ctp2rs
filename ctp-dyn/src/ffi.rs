@@ -135,6 +135,7 @@ impl<const N: usize> SetString for &mut [i8; N] {
 
 pub trait WrapToString {
     fn to_string(&self) -> String;
+    fn try_to_string(&self) -> Result<String, String>;
 }
 
 impl<const N: usize> WrapToString for [i8; N] {
@@ -142,12 +143,20 @@ impl<const N: usize> WrapToString for [i8; N] {
         let str_ = gb18030_cstr_i8_to_str(self);
         str_.unwrap().to_string()
     }
+
+    fn try_to_string(&self) -> Result<String, String> {
+        gb18030_cstr_i8_to_str(self).map(|cow| cow.to_string())
+    }
 }
 
 impl<const N: usize> WrapToString for &[i8; N] {
     fn to_string(&self) -> String {
         let str_ = gb18030_cstr_i8_to_str(*self);
         str_.unwrap().to_string()
+    }
+
+    fn try_to_string(&self) -> Result<String, String> {
+        gb18030_cstr_i8_to_str(*self).map(|cow| cow.to_string())
     }
 }
 

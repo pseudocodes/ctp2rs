@@ -155,7 +155,7 @@ pub fn run_td() {
     let tdspi_box = Box::new(base_tdspi);
     let tdspi_ptr = Box::into_raw(tdspi_box);
     let tdspi_ptr2 = tdspi_ptr.clone();
-    println!("get_api_version: {}", tdapi.get_api_version());
+    println!("td get_api_version: {}", tdapi.get_api_version());
 
     tdapi.register_front("tcp://121.37.80.177:20004"); // tts 7x24 td
 
