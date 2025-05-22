@@ -91,7 +91,10 @@ pub fn run_md() {
     let dynlib_path = "./tts/v6_7_2/win64/thostmduserapi_se.dll";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
-    println!("dynlib_path: {}", dynlib_path.as_path().to_string_lossy());
+    println!(
+        "md dynlib_path: {}",
+        dynlib_path.as_path().to_string_lossy()
+    );
 
     let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false);
 

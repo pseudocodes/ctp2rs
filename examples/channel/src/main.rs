@@ -114,6 +114,10 @@ pub fn run_channel_md() {
     let dynlib_path =
         "../../ctp-dyn/api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
 
+    #[cfg(target_os = "windows")]
+    let dynlib_path =
+        "../../ctp-dyn/api/v6.7.2/v6.7.2_20230913_api_traderapi64_se_windows/thostmduserapi_se.dll";
+
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
     println!("{}", dynlib_path.as_os_str().to_string_lossy());
 

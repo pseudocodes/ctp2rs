@@ -1,5 +1,15 @@
 # Changelog
 
+## [Unreleased] - 2025-05-22
+
+### Changed
+
+- 适配 Windows 动态库
+- 更新 build.rs 
+- Readme 更新
+- 版本号升级至 0.1.7-alpha3
+
+
 ## [Unreleased] - 2025-05-19
 
 ### Changed

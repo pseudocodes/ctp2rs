@@ -1,6 +1,6 @@
 [package]
 name = "ctp2rs"
-version = "0.1.7-alpha2"
+version = "0.1.7-alpha3"
 edition = "2021"
 authors = ["Pseudo <pseudocodes@gmail.com>"]
 description = "Shanghai Futures CTP/CTP-Mini/CTP-Sopt Rust native binding, supporting production, evaluation, stock-option, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"
@@ -10,7 +10,16 @@ repository = "https://github.com/pseudocodes/ctp2rs/tree/master/ctp-dyn"
 keywords = ["ctp", "ctp-rs", "ctp-binding", "quant", "trader"]
 categories = ["api-bindings", "finance"]
 
-exclude = ["*.log", "*.tmp", "scripts/*", "*.con", "*.framework", "*.so"]
+exclude = [
+    "*.log",
+    "*.tmp",
+    "scripts/*",
+    "*.con",
+    "*.framework",
+    "*.so",
+    "*.dll",
+    "*.lib",
+]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]

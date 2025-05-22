@@ -20,15 +20,30 @@ fn get_sdk_path() -> &'static std::path::Path {
     // 基于版本的分支判断
 
     if cfg!(feature = "mini_v1_6_9") {
-        return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_linux64_api_20240527/");
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_linux64_api_20240527/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_win_api_20240527/win64/");
+        }
     }
 
     if cfg!(feature = "mini_v1_7_0") {
-        return Path::new("./api/mini/v1.7.0/CTPIIMini_V1.7.0_linux64_api_20240923/");
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/mini/v1.7.0/CTPMini_V1.7.0_linux64_api_20240923/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/mini/v1.7.0/CTPIIMini_V1.7.0_win_api_20240923/win64/");
+        }
     }
 
     if cfg!(feature = "sopt_v3_7_3") {
-        return Path::new("./api/ctpsopt/v3.7.3/v3.7.3_20240910_api_traderapi_linux64_se/");
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctpsopt/v3.7.3/v3.7.3_20240910_api_traderapi_linux64_se/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctpsopt/v3.7.3/20240910_traderapi64_windows_se/");
+        }
     }
 
     if cfg!(feature = "ctp_v6_7_7") {
@@ -40,6 +55,9 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_traderapi64_se_windows/");
         }
     }
 
@@ -53,6 +71,9 @@ fn get_sdk_path() -> &'static std::path::Path {
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.8/v6.7.8_20240918_api_traderapi_se_linux64");
         }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.8/20240918_traderapi64_se_windows/");
+        }
     }
 
     if cfg!(feature = "ctp_v6_7_9") {
@@ -64,6 +85,9 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.9/v6.7.9_P1_20250319_api_traderapi_se_linux64/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.9/20250319_traderapi64_se_windows/");
         }
     }
 
