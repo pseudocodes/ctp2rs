@@ -1,0 +1,11 @@
+[package]
+name = "tts_sopt"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+ctp2rs = { path = "../../ctp-dyn/", optional = true }
+
+[features]
+default = ["ctp2rs/sopt_v3_7_3"]
