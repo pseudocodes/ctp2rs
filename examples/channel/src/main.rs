@@ -128,7 +128,7 @@ pub fn run_channel_md() {
 
     println!("get_api_version: {}", mdapi.get_api_version());
 
-    mdapi.register_front("tcp://180.168.146.187:10211");
+    mdapi.register_front("tcp://182.254.243.31:30011");
 
     let mdspi_ptr = Box::into_raw(mdspi_box) as *mut dyn MdSpi;
     let mdspi_ptr2 = mdspi_ptr.clone();

@@ -288,7 +288,7 @@ fn main() {
     let _tdspi_ptr2 = tdspi_ptr.clone();
     println!("get_api_version: {}", tdapi.get_api_version());
 
-    tdapi.register_front("tcp://180.168.146.187:10130"); // simnow 7x24 td
+    tdapi.register_front("tcp://182.254.243.31:40001"); // simnow 7x24 td
 
     tdapi.register_spi(tdspi_ptr);
     tdapi.subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);

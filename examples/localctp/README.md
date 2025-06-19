@@ -16,7 +16,7 @@
 OpenSqlDB done!~
 LocalCTP version: LocalCTP V1.0.0 By QiuShui(Aura) QQ1005018695
 [2024-12-11T07:01:36Z DEBUG localctp::localctpx] register name_server ""
-[2024-12-11T07:01:36Z INFO  localctp::localctpx] register front tcp://180.168.146.187:10201
+[2024-12-11T07:01:36Z INFO  localctp::localctpx] register front tcp://182.254.243.31:30001
 [2024-12-11T07:01:36Z DEBUG localctp::localctpx] register done
 [2024-12-11T07:01:36Z DEBUG localctp::localctpx] subscribe topic done
 [2024-12-11T07:01:36Z DEBUG localctp::localctpx] init done
