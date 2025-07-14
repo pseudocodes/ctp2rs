@@ -81,7 +81,7 @@ fn create_config_for_environment(
                 td_password: password,
                 td_app_id: "simnow_client_test".to_string(),
                 td_auth_code: "0000000000000000".to_string(),
-                td_front_address: "tcp://121.37.90.193:20002".to_string(), // SimNow 仿真环境
+                td_front_address: "tcp://121.37.90.193:20002".to_string(), // OPENCTP 仿真环境
                 td_dynlib_path,
             }
         }
