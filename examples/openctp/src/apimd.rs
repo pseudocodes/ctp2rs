@@ -1,5 +1,5 @@
 #![allow(unused_variables)]
-use std::{env::var, path::Path, sync::Arc, thread, time::Duration};
+use std::{sync::Arc, thread, time::Duration};
 
 use ctp2rs::{
     ffi::{gb18030_cstr_i8_to_str, AssignFromString, WrapToString},
@@ -10,16 +10,18 @@ use ctp2rs::{
     },
 };
 
+use crate::CtpAccountConfig;
+
 pub struct BaseMdSpi {
     pub(crate) mdapi: Arc<MdApi>,
+    pub(crate) config: CtpAccountConfig,
 }
 
 impl MdSpi for BaseMdSpi {
     fn on_front_connected(&mut self) {
         let mut req = CThostFtdcReqUserLoginField::default();
         println!("mdspi.on_front_connected");
-        let user_id = var("OPENCTP_USER_ID").unwrap();
-        req.UserID.assign_from_str(&user_id);
+        req.UserID.assign_from_str(&self.config.md_user_id);
         self.mdapi.req_user_login(&mut req, 1);
     }
 
@@ -34,7 +36,7 @@ impl MdSpi for BaseMdSpi {
         println!("on_rsp_user_login!");
 
         if is_last {
-            let instrument_ids = vec!["ag2507".to_string(), "ag2508".to_string()];
+            let instrument_ids = vec!["ag2510".to_string(), "au2510".to_string()];
             self.mdapi.subscribe_market_data(&instrument_ids);
         }
     }
@@ -76,37 +78,27 @@ impl MdSpi for BaseMdSpi {
     }
 }
 
-pub fn run_md() {
+pub fn run_md(config: CtpAccountConfig) {
     println!("mdapi start here!");
-
-    let base_dir = var("CARGO_MANIFEST_DIR").unwrap();
-    println!("base_dir: {base_dir}");
-    #[cfg(target_os = "macos")]
-    let dynlib_path = "./tts/v6_7_2/mac_arm64/thostmduserapi_se.dylib";
-
-    #[cfg(target_os = "linux")]
-    let dynlib_path = "./tts/v6_7_2/lin64/thostmduserapi_se.so";
-
-    #[cfg(target_os = "windows")]
-    let dynlib_path = "./tts/v6_7_2/win64/thostmduserapi_se.dll";
-
-    let dynlib_path = Path::new(&base_dir).join(dynlib_path);
     println!(
         "md dynlib_path: {}",
-        dynlib_path.as_path().to_string_lossy()
+        config.md_dynlib_path.to_string_lossy()
     );
 
-    let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false);
-
+    let mdapi = MdApi::create_api(&config.md_dynlib_path, "./md_", false, false);
     let mdapi = Arc::new(mdapi);
+
+    // 先获取 front_address，避免 move 后的借用问题
+    let front_address = config.md_front_address.clone();
 
     let base_mdspi: BaseMdSpi = BaseMdSpi {
         mdapi: Arc::clone(&mdapi),
+        config,
     };
     let mdspi_box = Box::new(base_mdspi);
     println!("md get_api_version: {}", mdapi.get_api_version());
 
-    mdapi.register_front("tcp://121.37.80.177:20004"); // tts 7x24 md
+    mdapi.register_front(&front_address);
 
     let mdspi_ptr = Box::into_raw(mdspi_box) as *mut dyn MdSpi;
     let mdspi_ptr2 = mdspi_ptr.clone();

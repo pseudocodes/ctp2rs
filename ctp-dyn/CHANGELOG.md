@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased] - 2025-07-14
+### Changed
+- Readme 更新
+- openctp sample 更新，支持 openctp 仿真环境
+
 ## [Unreleased] - 2025-05-22
 
 ### Changed
