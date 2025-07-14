@@ -87,6 +87,7 @@ cargo run --example <example>
 - [localctp](../examples/localctp/): 运行 localctp 的一个样例，支持 Linux
 - [openctp](../examples/openctp): 连接 openctp 模拟平台的行情以及交易样例，支持 MacOS 以及 Linux 
 - [insecure](../examples/insecure): 可跨版本加载动态方案 POC Demo, 适用 Linux
+- [tts_sopt](../examples/tts_sopt): ctp-sopt 连接 openctp 股票期权仿真环境 demo 
   
 ### open-md-gateway
 
@@ -109,6 +110,8 @@ cargo run --example <example>
 |9| ctp-futures|[github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)|[ctp-futures](https://crates.io/crates/ctp-futures)| Win64/Linux |rust-share 的分支实现 |
 |10| localctp-sys| [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)|[localctp-sys](https://crates.io/crates/localctp-sys)| Win64/Linux| rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本|
 |11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|[rptx](https://crates.io/crates/rtpx)| Linux| `1` 分支实现, 仅实现了 TraderApi 绑定|
+|12| ctp4rs| [github.com/rn7s2/ctp4rs](https://github.com/rn7s2/ctp4rs)|[ctp4rs](https://crates.io/crates/ctp4rs)| Win64/Linux| 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp-6.7.8 单一版本|
+
 
 
 ### Potential Issues
