@@ -9,51 +9,85 @@ use libloading::Library;
 
 use crate::v1alpha1::{CThostFtdcMdApi, CThostFtdcTraderApi, MdApi, TraderApi};
 
-#[cfg(all(not(feature = "sopt"), not(target_os = "windows")))]
 mod symbols {
-    pub const MDAPI_CREATE_API_SYMBOL: &[u8] = b"_ZN15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb";
-    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN15CThostFtdcMdApi13GetApiVersionEv";
-    pub const TDAPI_CREATE_API_SYMBOL: &[u8] = b"_ZN19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc";
-    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"_ZN19CThostFtdcTraderApi13GetApiVersionEv";
-}
+    // 合并相同的 GET_API_VERSION 符号
+    #[cfg(not(target_os = "windows"))]
+    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"_ZN8ctp_sopt15CThostFtdcMdApi13GetApiVersionEv"
+    } else {
+        b"_ZN15CThostFtdcMdApi13GetApiVersionEv"
+    };
 
-#[cfg(all(not(feature = "sopt"), target_os = "windows"))]
-mod symbols {
-    pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
-        b"?CreateFtdcMdApi@CThostFtdcMdApi@@SAPEAV1@PEBD_N1@Z";
-    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"?GetApiVersion@CThostFtdcMdApi@@SAPEBDXZ";
-    pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
-        b"?CreateFtdcTraderApi@CThostFtdcTraderApi@@SAPEAV1@PEBD@Z";
-    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = b"?GetApiVersion@CThostFtdcTraderApi@@SAPEBDXZ";
-}
+    #[cfg(not(target_os = "windows"))]
+    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"_ZN8ctp_sopt19CThostFtdcTraderApi13GetApiVersionEv"
+    } else {
+        b"_ZN19CThostFtdcTraderApi13GetApiVersionEv"
+    };
 
-#[cfg(all(feature = "sopt", not(target_os = "windows")))]
-mod symbols {
+    #[cfg(target_os = "windows")]
+    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"?GetApiVersion@CThostFtdcMdApi@ctp_sopt@@SAPEBDXZ"
+    } else {
+        b"?GetApiVersion@CThostFtdcMdApi@@SAPEBDXZ"
+    };
+
+    #[cfg(target_os = "windows")]
+    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"?GetApiVersion@CThostFtdcTraderApi@ctp_sopt@@SAPEBDXZ"
+    } else {
+        b"?GetApiVersion@CThostFtdcTraderApi@@SAPEBDXZ"
+    };
+
+    // CREATE 符号需要按具体条件分别定义
+    #[cfg(all(not(feature = "sopt"), not(target_os = "windows")))]
+    pub const MDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+        b"_ZN15CThostFtdcMdApi15CreateFtdcMdApiEPKcbbb"
+    } else {
+        b"_ZN15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb"
+    };
+
+    #[cfg(all(not(feature = "sopt"), not(target_os = "windows")))]
+    pub const TDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+        b"_ZN19CThostFtdcTraderApi19CreateFtdcTraderApiEPKcb"
+    } else {
+        b"_ZN19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc"
+    };
+
+    #[cfg(all(feature = "sopt", not(target_os = "windows")))]
     pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
         b"_ZN8ctp_sopt15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb";
-    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] =
-        b"_ZN8ctp_sopt15CThostFtdcMdApi13GetApiVersionEv";
+
+    #[cfg(all(feature = "sopt", not(target_os = "windows")))]
     pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
         b"_ZN8ctp_sopt19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc";
-    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] =
-        b"_ZN8ctp_sopt19CThostFtdcTraderApi13GetApiVersionEv";
-}
 
-#[cfg(all(feature = "sopt", target_os = "windows"))]
-mod symbols {
+    #[cfg(all(not(feature = "sopt"), target_os = "windows"))]
+    pub const MDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+        b"?CreateFtdcMdApi@CThostFtdcMdApi@@SAPEAV1@PEBD_N1_N@Z"
+    } else {
+        b"?CreateFtdcMdApi@CThostFtdcMdApi@@SAPEAV1@PEBD_N1@Z"
+    };
+
+    #[cfg(all(not(feature = "sopt"), target_os = "windows"))]
+    pub const TDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+        b"?CreateFtdcTraderApi@CThostFtdcTraderApi@@SAPEAV1@PEBD_N@Z"
+    } else {
+        b"?CreateFtdcTraderApi@CThostFtdcTraderApi@@SAPEAV1@PEBD@Z"
+    };
+
+    #[cfg(all(feature = "sopt", target_os = "windows"))]
     pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
         b"?CreateFtdcMdApi@CThostFtdcMdApi@ctp_sopt@@SAPEAV12@PEBD_N1@Z";
-    pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] =
-        b"?GetApiVersion@CThostFtdcMdApi@ctp_sopt@@SAPEBDXZ";
+
+    #[cfg(all(feature = "sopt", target_os = "windows"))]
     pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
         b"?CreateFtdcTraderApi@CThostFtdcTraderApi@ctp_sopt@@SAPEAV12@PEBD@Z";
-    pub const TDAPI_GET_API_VERSION_SYMBOL: &[u8] =
-        b"?GetApiVersion@CThostFtdcTraderApi@ctp_sopt@@SAPEBDXZ";
 }
-
 pub use symbols::*;
 
 impl MdApi {
+    #[cfg(not(feature = "ctp_v6_7_11"))]
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(
         dynlib_path: P,
         flow_path: F,
@@ -68,6 +102,38 @@ impl MdApi {
         let cflow_path = CString::new(flow_path.as_ref().to_str().unwrap()).expect("fail to new");
         let api_ptr: *mut CThostFtdcMdApi =
             unsafe { create_api(cflow_path.as_ptr(), is_using_udp, is_multicast) };
+
+        Self {
+            api_ptr: api_ptr,
+            spi_ptr: Cell::new(null_mut()),
+            dynlib: Some(dynlib),
+        }
+    }
+
+    #[cfg(feature = "ctp_v6_7_11")]
+    pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(
+        dynlib_path: P,
+        flow_path: F,
+        is_using_udp: bool,
+        is_multicast: bool,
+        is_production_mode: bool,
+    ) -> Self {
+        // CThostFtdcMdApi_CreateFtdcMdApi(flow_path, is_using_udp, is_multicast)
+        let dynlib =
+            unsafe { libloading::Library::new(dynlib_path.as_ref()).expect("failed to open") };
+        type MdApiCreator =
+            unsafe extern "C" fn(*const c_char, bool, bool, bool) -> *mut CThostFtdcMdApi;
+        let create_api: libloading::Symbol<MdApiCreator> =
+            unsafe { dynlib.get(MDAPI_CREATE_API_SYMBOL).expect("failed to get") };
+        let cflow_path = CString::new(flow_path.as_ref().to_str().unwrap()).expect("fail to new");
+        let api_ptr: *mut CThostFtdcMdApi = unsafe {
+            create_api(
+                cflow_path.as_ptr(),
+                is_using_udp,
+                is_multicast,
+                is_production_mode,
+            )
+        };
 
         Self {
             api_ptr: api_ptr,
@@ -130,6 +196,7 @@ pub struct MdApiBuilder {
     flow_path: Option<String>,
     use_udp: bool,
     use_multicast: bool,
+    use_production_mode: bool,
     dynlib: Option<String>,
 }
 
@@ -139,6 +206,7 @@ impl MdApiBuilder {
             flow_path: None,
             use_udp: false,
             use_multicast: false,
+            use_production_mode: true, // 默认使用生产模式
             dynlib: None,
         }
     }
@@ -175,6 +243,7 @@ impl MdApiBuilder {
         let flow_path = self.flow_path.unwrap().clone();
         let use_udp = self.use_udp;
         let use_multicast = self.use_multicast;
+        let use_production_mode = self.use_production_mode;
 
         // utils::check_and_create_dir(flow_path.as_str())?;
         match self.dynlib {
@@ -187,15 +256,36 @@ impl MdApiBuilder {
                 println!("here?");
                 unsafe {
                     let lib = libloading::Library::new(dynlib_path).expect("load dynlib error");
-                    type MdApiCreator =
-                        unsafe extern "C" fn(*const c_char, bool, bool) -> *mut CThostFtdcMdApi;
-                    let create_api: libloading::Symbol<MdApiCreator> = lib
-                        .get(MDAPI_CREATE_API_SYMBOL)
-                        .expect("get md_create_api symbol error");
-                    let cflow_path =
-                        CString::new(flow_path.as_bytes()).expect("create cflow path error");
-                    mdapi.api_ptr = create_api(cflow_path.as_ptr(), use_udp, use_multicast);
-                    mdapi.dynlib = Some(lib);
+                    if cfg!(not(feature = "ctp_v6_7_11")) {
+                        type MdApiCreator =
+                            unsafe extern "C" fn(*const c_char, bool, bool) -> *mut CThostFtdcMdApi;
+                        let create_api: libloading::Symbol<MdApiCreator> = lib
+                            .get(MDAPI_CREATE_API_SYMBOL)
+                            .expect("get md_create_api symbol error");
+                        let cflow_path =
+                            CString::new(flow_path.as_bytes()).expect("create cflow path error");
+                        mdapi.api_ptr = create_api(cflow_path.as_ptr(), use_udp, use_multicast);
+                        mdapi.dynlib = Some(lib);
+                    } else {
+                        type MdApiCreator = unsafe extern "C" fn(
+                            *const c_char,
+                            bool,
+                            bool,
+                            bool,
+                        )
+                            -> *mut CThostFtdcMdApi;
+                        let create_api: libloading::Symbol<MdApiCreator> = lib
+                            .get(MDAPI_CREATE_API_SYMBOL)
+                            .expect("get md_create_api symbol error");
+                        let cflow_path =
+                            CString::new(flow_path.as_bytes()).expect("create cflow path error");
+                        mdapi.api_ptr = create_api(
+                            cflow_path.as_ptr(),
+                            use_udp,
+                            use_multicast,
+                            use_production_mode,
+                        );
+                    }
                 }
                 Ok(mdapi)
             }
@@ -205,6 +295,7 @@ impl MdApiBuilder {
 }
 
 impl TraderApi {
+    #[cfg(not(feature = "ctp_v6_7_11"))]
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(dynlib_path: P, flow_path: F) -> Self {
         let dynlib =
             unsafe { libloading::Library::new(dynlib_path.as_ref()).expect("failed to open") };
@@ -213,6 +304,30 @@ impl TraderApi {
             unsafe { dynlib.get(TDAPI_CREATE_API_SYMBOL).expect("failed to get") };
         let cflow_path = CString::new(flow_path.as_ref().to_str().unwrap()).expect("fail to new");
         let api_ptr: *mut CThostFtdcTraderApi = unsafe { create_api(cflow_path.as_ptr()) };
+
+        Self {
+            api_ptr: api_ptr,
+            spi_ptr: Cell::new(null_mut()),
+            dynlib: Some(dynlib),
+        }
+    }
+
+    #[cfg(feature = "ctp_v6_7_11")]
+    pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(
+        dynlib_path: P,
+        flow_path: F,
+        is_production_mode: bool,
+    ) -> Self {
+        // CThostFtdcMdApi_CreateFtdcMdApi(flow_path, is_using_udp, is_multicast)
+        let dynlib =
+            unsafe { libloading::Library::new(dynlib_path.as_ref()).expect("failed to open") };
+        type TraderApiCreator =
+            unsafe extern "C" fn(*const c_char, bool) -> *mut CThostFtdcTraderApi;
+        let create_api: libloading::Symbol<TraderApiCreator> =
+            unsafe { dynlib.get(TDAPI_CREATE_API_SYMBOL).expect("failed to get") };
+        let cflow_path = CString::new(flow_path.as_ref().to_str().unwrap()).expect("fail to new");
+        let api_ptr: *mut CThostFtdcTraderApi =
+            unsafe { create_api(cflow_path.as_ptr(), is_production_mode) };
 
         Self {
             api_ptr: api_ptr,

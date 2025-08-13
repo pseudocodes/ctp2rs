@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased] - 2025-08-13
+### Changed
+- Readme 更新
+- 添加对 ctp 6.7.11 版本的支持，ctp 实例创建接口新增 `production_mode` 参数
+- 版本号升级至 0.1.8-alpha1
+
+
 ## [Unreleased] - 2025-07-14
 ### Changed
 - Readme 更新

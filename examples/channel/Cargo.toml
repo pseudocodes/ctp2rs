@@ -11,4 +11,7 @@ dotenv = "0.15.0"
 env_logger = "0.11.5"
 
 [features]
-default = ["ctp2rs/default"]
+default = ["ctp2rs", "ctp2rs/default"]
+# Re-export dependency features so we can use `#[cfg(feature = "ctp_v6_7_11")]` locally
+ctp_v6_7_11 = ["ctp2rs/ctp_v6_7_11"]
+ctp_v6_7_2 = ["ctp2rs/ctp_v6_7_2"]

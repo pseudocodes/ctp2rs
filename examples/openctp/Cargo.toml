@@ -10,3 +10,5 @@ ctp2rs = { path = "../../ctp-dyn/", optional = true }
 
 [features]
 default = ["ctp2rs/openctp"]
+ctp_v6_7_11 = ["ctp2rs/ctp_v6_7_11"]
+ctp_v6_7_2 = ["ctp2rs/ctp_v6_7_2"]

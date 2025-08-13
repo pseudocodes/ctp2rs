@@ -36,7 +36,7 @@ impl MdSpi for BaseMdSpi {
         println!("on_rsp_user_login!");
 
         if is_last {
-            let instrument_ids = vec!["ag2510".to_string(), "au2510".to_string()];
+            let instrument_ids = vec!["ag2512".to_string(), "au2512".to_string()];
             self.mdapi.subscribe_market_data(&instrument_ids);
         }
     }
@@ -85,7 +85,12 @@ pub fn run_md(config: CtpAccountConfig) {
         config.md_dynlib_path.to_string_lossy()
     );
 
+    #[cfg(not(feature = "ctp_v6_7_11"))]
     let mdapi = MdApi::create_api(&config.md_dynlib_path, "./md_", false, false);
+
+    #[cfg(feature = "ctp_v6_7_11")]
+    let mdapi = MdApi::create_api(&config.md_dynlib_path, "./md_", false, false, true);
+
     let mdapi = Arc::new(mdapi);
 
     // 先获取 front_address，避免 move 后的借用问题

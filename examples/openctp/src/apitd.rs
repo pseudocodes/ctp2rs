@@ -134,7 +134,12 @@ pub fn run_td(config: CtpAccountConfig) {
         config.td_dynlib_path.to_string_lossy()
     );
 
+    #[cfg(not(feature = "ctp_v6_7_11"))]
     let tdapi = TraderApi::create_api(&config.td_dynlib_path, "./td_");
+
+    #[cfg(feature = "ctp_v6_7_11")]
+    let tdapi = TraderApi::create_api(&config.td_dynlib_path, "./td_", true);
+
     let tdapi = Arc::new(tdapi);
 
     // 先获取 front_address，避免 move 后的借用问题

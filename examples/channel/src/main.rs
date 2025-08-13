@@ -110,18 +110,30 @@ pub fn run_channel_md() {
     let dynlib_path =
         "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se";
 
-    #[cfg(target_os = "linux")]
+    #[cfg(all(target_os = "linux", not(feature = "ctp_v6_7_11")))]
     let dynlib_path =
-        "../../ctp-dyn/api/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
+        "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so";
 
-    #[cfg(target_os = "windows")]
+    #[cfg(all(target_os = "linux", feature = "ctp_v6_7_11"))]
+    let dynlib_path = "../../ctp-dyn/api/ctp/v6.7.11/v6.7.11_20250617_api_traderapi_se_linux64/thostmduserapi_se.so";
+
+    #[cfg(all(target_os = "windows", not(feature = "ctp_v6_7_11")))]
     let dynlib_path =
-        "../../ctp-dyn/api/v6.7.2/v6.7.2_20230913_api_traderapi64_se_windows/thostmduserapi_se.dll";
+        "../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi64_se_windows/thostmduserapi_se.dll";
+
+    #[cfg(all(target_os = "windows", feature = "ctp_v6_7_11"))]
+    let dynlib_path =
+        "../../ctp-dyn/api/ctp/v6.7.11/v6.7.11_20250617_traderapi64_se_windows/thostmduserapi_se.dll";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
     println!("{}", dynlib_path.as_os_str().to_string_lossy());
 
+    #[cfg(not(feature = "ctp_v6_7_11"))]
     let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false);
+
+    #[cfg(feature = "ctp_v6_7_11")]
+    let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false, true);
+
     let (tx, rx) = mpsc::sync_channel(1024);
     let mdspi = ChannelSpi { tx: tx };
     let mdspi_box = Box::new(mdspi);
@@ -157,7 +169,7 @@ pub fn run_channel_md() {
     match rx.recv_timeout(std::time::Duration::from_secs(5)) {
         Err(_) => error!("Timeout try recv `req_user_login`"),
         Ok(MdSpiEvent::OnRspUserLogin(rsp)) => {
-            let instrument_ids = vec!["ag2508".to_string(), "fu2505".to_string()];
+            let instrument_ids = vec!["ag2512".to_string(), "fu2601".to_string()];
             mdapi.subscribe_market_data(&instrument_ids);
         }
         Ok(event) => {

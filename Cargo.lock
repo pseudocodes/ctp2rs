@@ -123,9 +123,9 @@ dependencies = [
 
 [[package]]
 name = "bindgen"
-version = "0.71.0"
+version = "0.72.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "360897d4f2fdeea5d32f6dac9287952ae5babdc2aad42ad787c9470a4a6e3fee"
+checksum = "4f72209734318d0b619a5e0f5129918b848c416e122a3c4ce054e03cb87b726f"
 dependencies = [
  "bitflags",
  "cexpr",
@@ -292,7 +292,7 @@ version = "0.1.0"
 
 [[package]]
 name = "ctp2rs"
-version = "0.1.7"
+version = "0.1.8-alpha1"
 dependencies = [
  "Inflector",
  "bindgen",
