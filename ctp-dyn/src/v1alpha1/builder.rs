@@ -10,7 +10,7 @@ use libloading::Library;
 use crate::v1alpha1::{CThostFtdcMdApi, CThostFtdcTraderApi, MdApi, TraderApi};
 
 mod symbols {
-    // 合并相同的 GET_API_VERSION 符号
+    // GET_API_VERSION 符号
     #[cfg(not(target_os = "windows"))]
     pub const MDAPI_GET_API_VERSION_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
         b"_ZN8ctp_sopt15CThostFtdcMdApi13GetApiVersionEv"
@@ -39,55 +39,48 @@ mod symbols {
         b"?GetApiVersion@CThostFtdcTraderApi@@SAPEBDXZ"
     };
 
-    // CREATE 符号需要按具体条件分别定义
-    #[cfg(all(not(feature = "sopt"), not(target_os = "windows")))]
-    pub const MDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+    // CREATE 符号 - 优先级: sopt > union > 默认
+    #[cfg(not(target_os = "windows"))]
+    pub const MDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"_ZN8ctp_sopt15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb"
+    } else if cfg!(feature = "union") {
         b"_ZN15CThostFtdcMdApi15CreateFtdcMdApiEPKcbbb"
     } else {
         b"_ZN15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb"
     };
 
-    #[cfg(all(not(feature = "sopt"), not(target_os = "windows")))]
-    pub const TDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+    #[cfg(not(target_os = "windows"))]
+    pub const TDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"_ZN8ctp_sopt19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc"
+    } else if cfg!(feature = "union") {
         b"_ZN19CThostFtdcTraderApi19CreateFtdcTraderApiEPKcb"
     } else {
         b"_ZN19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc"
     };
 
-    #[cfg(all(feature = "sopt", not(target_os = "windows")))]
-    pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
-        b"_ZN8ctp_sopt15CThostFtdcMdApi15CreateFtdcMdApiEPKcbb";
-
-    #[cfg(all(feature = "sopt", not(target_os = "windows")))]
-    pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
-        b"_ZN8ctp_sopt19CThostFtdcTraderApi19CreateFtdcTraderApiEPKc";
-
-    #[cfg(all(not(feature = "sopt"), target_os = "windows"))]
-    pub const MDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+    #[cfg(target_os = "windows")]
+    pub const MDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"?CreateFtdcMdApi@CThostFtdcMdApi@ctp_sopt@@SAPEAV12@PEBD_N1@Z"
+    } else if cfg!(feature = "union") {
         b"?CreateFtdcMdApi@CThostFtdcMdApi@@SAPEAV1@PEBD_N1_N@Z"
     } else {
         b"?CreateFtdcMdApi@CThostFtdcMdApi@@SAPEAV1@PEBD_N1@Z"
     };
 
-    #[cfg(all(not(feature = "sopt"), target_os = "windows"))]
-    pub const TDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "ctp_v6_7_11") {
+    #[cfg(target_os = "windows")]
+    pub const TDAPI_CREATE_API_SYMBOL: &[u8] = if cfg!(feature = "sopt") {
+        b"?CreateFtdcTraderApi@CThostFtdcTraderApi@ctp_sopt@@SAPEAV12@PEBD@Z"
+    } else if cfg!(feature = "union") {
         b"?CreateFtdcTraderApi@CThostFtdcTraderApi@@SAPEAV1@PEBD_N@Z"
     } else {
         b"?CreateFtdcTraderApi@CThostFtdcTraderApi@@SAPEAV1@PEBD@Z"
     };
-
-    #[cfg(all(feature = "sopt", target_os = "windows"))]
-    pub const MDAPI_CREATE_API_SYMBOL: &[u8] =
-        b"?CreateFtdcMdApi@CThostFtdcMdApi@ctp_sopt@@SAPEAV12@PEBD_N1@Z";
-
-    #[cfg(all(feature = "sopt", target_os = "windows"))]
-    pub const TDAPI_CREATE_API_SYMBOL: &[u8] =
-        b"?CreateFtdcTraderApi@CThostFtdcTraderApi@ctp_sopt@@SAPEAV12@PEBD@Z";
 }
+// 重新导出符号
 pub use symbols::*;
 
 impl MdApi {
-    #[cfg(not(feature = "ctp_v6_7_11"))]
+    #[cfg(not(feature = "union"))]
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(
         dynlib_path: P,
         flow_path: F,
@@ -110,7 +103,7 @@ impl MdApi {
         }
     }
 
-    #[cfg(feature = "ctp_v6_7_11")]
+    #[cfg(feature = "union")]
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(
         dynlib_path: P,
         flow_path: F,
@@ -239,6 +232,13 @@ impl MdApiBuilder {
         }
     }
 
+    pub fn production_mode(self, value: bool) -> Self {
+        Self {
+            use_production_mode: value,
+            ..self
+        }
+    }
+
     pub fn build(self) -> Result<MdApi, &'static str> {
         let flow_path = self.flow_path.unwrap().clone();
         let use_udp = self.use_udp;
@@ -253,10 +253,9 @@ impl MdApiBuilder {
                     spi_ptr: Cell::new(null_mut()),
                     dynlib: None,
                 };
-                println!("here?");
                 unsafe {
                     let lib = libloading::Library::new(dynlib_path).expect("load dynlib error");
-                    if cfg!(not(feature = "ctp_v6_7_11")) {
+                    if cfg!(not(feature = "union")) {
                         type MdApiCreator =
                             unsafe extern "C" fn(*const c_char, bool, bool) -> *mut CThostFtdcMdApi;
                         let create_api: libloading::Symbol<MdApiCreator> = lib
@@ -295,7 +294,7 @@ impl MdApiBuilder {
 }
 
 impl TraderApi {
-    #[cfg(not(feature = "ctp_v6_7_11"))]
+    #[cfg(not(feature = "union"))]
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(dynlib_path: P, flow_path: F) -> Self {
         let dynlib =
             unsafe { libloading::Library::new(dynlib_path.as_ref()).expect("failed to open") };
@@ -312,7 +311,7 @@ impl TraderApi {
         }
     }
 
-    #[cfg(feature = "ctp_v6_7_11")]
+    #[cfg(feature = "union")]
     pub fn create_api<P: AsRef<Path>, F: AsRef<Path>>(
         dynlib_path: P,
         flow_path: F,
