@@ -1,10 +1,15 @@
 
-[![Ask DeepWiki]][deepwiki] [![Crates.io Version]][crates.io]
+[![GitHub Site]][github] [![Crates.io Version]][crates.io] [![Ask DeepWiki]][deepwiki] [![Rust DOC]][rust doc link]
 
 [Crates.io Version]: https://img.shields.io/crates/v/ctp2rs
 [crates.io]: https://crates.io/crates/ctp2rs
+[Github Site]: https://img.shields.io/badge/Github-pseudocodes/ctp2rs-green&logo=github
+[github]: https://github.com/pseudocodes/ctp2rs
 [Ask DeepWiki]: https://deepwiki.com/badge.svg
 [deepwiki]: https://deepwiki.com/pseudocodes/ctp2rs
+[Rust Doc]: https://img.shields.io/docsrs/ctp2rs/latest
+[rust doc link]: https://docs.rs/ctp2rs
+
 
 # Ctp2rs
 

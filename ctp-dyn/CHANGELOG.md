@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased] - 2025-09-19
+### Changed
+- Readme 更新
+- 更新 MdApi 订阅相关接口的参数
+- 修复 Api Drop 可能产生的重复 Release 问题
+- 版本号升级至 0.1.8-alpha3
+
+
 ## [Unreleased] - 2025-08-13
 ### Changed
 - Readme 更新
