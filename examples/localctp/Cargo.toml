@@ -3,6 +3,14 @@ name = "localctp"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "query"
+path = "src/bin/query.rs"
+
+[[bin]]
+name = "sim"
+path = "src/bin/sim.rs"
+
 [dependencies]
 ctp2rs = { path = "../../ctp-dyn", optional = true }
 
@@ -11,11 +19,11 @@ dotenv = "0.15.0"
 env_logger = "0.11.5"
 
 
-rand = "0.8.5"
+rand = "0.9"
 chrono = "0.4"
 futures = "0.3.31"
 
 
 tokio = { version = "1.43.1", features = ["full"] }
 [features]
-default = ["ctp2rs/default"]
+default = ["ctp2rs/default", "ctp2rs/openctp"]
