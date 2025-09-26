@@ -1,10 +1,25 @@
 # Changelog
 
+## [Unreleased] - 2025-09-26
+### Changed
+-  Readme 更新
+-  LocalCTP 样例更新，支持 MacOS 环境，添加共享内存行情导入 case
+-  版本号升级至 **0.1.8**
+
+
+## [Unreleased] - 2025-09-19
+### Changed
+- Readme 更新
+- 更新 MdApi 订阅相关接口的参数
+- 修复 Api Drop 可能产生的重复 Release 问题
+- 版本号升级至 **0.1.8-alpha3**
+
+
 ## [Unreleased] - 2025-08-13
 ### Changed
 - Readme 更新
 - 添加对 ctp 6.7.11 版本的支持，ctp 实例创建接口新增 `production_mode` 参数
-- 版本号升级至 0.1.8-alpha1
+- 版本号升级至 **0.1.8-alpha1**
 
 
 ## [Unreleased] - 2025-07-14
@@ -19,7 +34,7 @@
 - 适配 Windows 动态库
 - 更新 build.rs 
 - Readme 更新
-- 版本号升级至 0.1.7-alpha3
+- 版本号升级至 **0.1.7-alpha3**
 
 
 ## [Unreleased] - 2025-05-19
@@ -30,7 +45,7 @@
 - 更新 build.rs 
 - 若 API 依赖路径不存在 `error.xml`, 则不会提供 `CtpError` 支持
 - Readme 更新
-- 版本号升级至 0.1.7-alpha1
+- 版本号升级至 **0.1.7-alpha1**
 
 ## [Unreleased] - 2025-05-11
 
@@ -39,7 +54,7 @@
 - 添加对 `error.xml` 的解析，生成 `CtpError` 封装
 - 更新 build.rs 
 - Readme 更新
-- 版本号升级至 0.1.6
+- 版本号升级至 **0.1.6**
 
 
 ## [Unreleased] - 2025-05-01
@@ -49,7 +64,7 @@
 - 更新添加 6.7.9 对应官方 CTP 库 Linux 版本
 - 更新 build.rs 
 - Readme 更新
-- 版本号升级至 0.1.5
+- 版本号升级至 **0.1.5**
 
 
 ## [Unreleased] - 2025-02-19
@@ -60,7 +75,7 @@
 - 更新支持 ctp-sopt v3.7.3 Linux 版
 - 更新 build.rs 
 - Readme 更新
-- 版本号升级至 0.1.4 
+- 版本号升级至 **0.1.4** 
 
 ## [Unreleased] - 2024-12-13
 

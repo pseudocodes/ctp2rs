@@ -4,6 +4,7 @@ use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::path::Path;
 use std::ptr::null_mut;
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use libloading::Library;
 
@@ -100,6 +101,7 @@ impl MdApi {
             api_ptr: api_ptr,
             spi_ptr: Cell::new(null_mut()),
             dynlib: Some(dynlib),
+            released: AtomicBool::new(false),
         }
     }
 
@@ -132,6 +134,7 @@ impl MdApi {
             api_ptr: api_ptr,
             spi_ptr: Cell::new(null_mut()),
             dynlib: Some(dynlib),
+            released: AtomicBool::new(false),
         }
     }
 
@@ -174,12 +177,14 @@ impl Drop for MdApi {
                 drop(last_spi);
             }
         }
+        let already = self.released.swap(true, Ordering::SeqCst);
         unsafe {
-            if !self.api_ptr.is_null() {
+            if !already && !self.api_ptr.is_null() {
                 ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Release)(self.api_ptr);
             }
-            let dynlib = self.dynlib.take();
-            let _ = dynlib.unwrap().close();
+            if let Some(lib) = self.dynlib.take() {
+                let _ = lib.close();
+            }
         }
     }
 }
@@ -252,6 +257,7 @@ impl MdApiBuilder {
                     api_ptr: null_mut(),
                     spi_ptr: Cell::new(null_mut()),
                     dynlib: None,
+                    released: AtomicBool::new(false),
                 };
                 unsafe {
                     let lib = libloading::Library::new(dynlib_path).expect("load dynlib error");
@@ -265,6 +271,7 @@ impl MdApiBuilder {
                             CString::new(flow_path.as_bytes()).expect("create cflow path error");
                         mdapi.api_ptr = create_api(cflow_path.as_ptr(), use_udp, use_multicast);
                         mdapi.dynlib = Some(lib);
+                        mdapi.released = AtomicBool::new(false);
                     } else {
                         type MdApiCreator = unsafe extern "C" fn(
                             *const c_char,
@@ -308,6 +315,7 @@ impl TraderApi {
             api_ptr: api_ptr,
             spi_ptr: Cell::new(null_mut()),
             dynlib: Some(dynlib),
+            released: AtomicBool::new(false),
         }
     }
 
@@ -332,6 +340,7 @@ impl TraderApi {
             api_ptr: api_ptr,
             spi_ptr: Cell::new(null_mut()),
             dynlib: Some(dynlib),
+            released: AtomicBool::new(false),
         }
     }
 
@@ -374,12 +383,14 @@ impl Drop for TraderApi {
                 drop(last_spi);
             }
         }
+        let already = self.released.swap(true, Ordering::SeqCst);
         unsafe {
-            if !self.api_ptr.is_null() {
+            if !already && !self.api_ptr.is_null() {
                 ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_Release)(self.api_ptr);
             }
-            let dynlib = self.dynlib.take();
-            let _ = dynlib.unwrap().close();
+            if let Some(lib) = self.dynlib.take() {
+                let _ = lib.close();
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "ctp2rs"
-version = "0.1.8-alpha2"
+version = "0.1.8"
 edition = "2021"
 authors = ["Pseudo <pseudocodes@gmail.com>"]
 description = "Shanghai Futures CTP/CTP-Mini/CTP-Sopt Rust native binding, supporting production, evaluation, stock-option, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"

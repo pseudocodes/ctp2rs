@@ -11,9 +11,7 @@ use ctp2rs::v1alpha1::{bindings::*, TraderApi, TraderSpiInner, TraderSpiStream};
 
 use ctp2rs::v1alpha1::event::TraderSpiEvent::*;
 
-use log::{debug, info};
-use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
+use log::{debug, error, info};
 
 use tokio::time;
 
@@ -54,31 +52,27 @@ pub struct FakeMarketQuote {
 
 async fn simulate_market_data(api: Arc<Box<LocalCTP>>) {
     let mut interval = time::interval(Duration::from_millis(500));
-    let mut rng = StdRng::from_entropy(); // Using a thread-safe RNG that can be sent across threads
-
+    // 使用全局 random / random_range 函数（避免线程局部 RNG Send 问题）
     loop {
         interval.tick().await;
         let market_quote = FakeMarketQuote {
-            instrument_id: "ag2406".to_string(),
-            bid_price: rng.gen_range(1000.0..2000.0),
-            ask_price: rng.gen_range(1000.0..2000.0),
-            quote_ref: format!("{:.1}", rng.gen::<f64>() * 1000.0),
-            last_price: format!("{:.2}", rng.gen::<f64>() * 5000.0),
-            settlement_price: format!("{:.2}", rng.gen::<f64>() * 5000.0),
-            upper_limit_price: format!("{:.2}", rng.gen::<f64>() * 6000.0),
-            lower_limit_price: format!("{:.2}", rng.gen::<f64>() * 4000.0),
-            business_unit: format!("{:08}", rng.gen::<u32>()),
-            volume: rng.gen_range(1..100),
+            instrument_id: "ag2506".to_string(),
+            bid_price: rand::random_range(1000.0..2000.0),
+            ask_price: rand::random_range(1000.0..2000.0),
+            quote_ref: format!("{:.1}", rand::random::<f64>() * 1000.0),
+            last_price: format!("{:.2}", rand::random::<f64>() * 5000.0),
+            settlement_price: format!("{:.2}", rand::random::<f64>() * 5000.0),
+            upper_limit_price: format!("{:.2}", rand::random::<f64>() * 6000.0),
+            lower_limit_price: format!("{:.2}", rand::random::<f64>() * 4000.0),
+            business_unit: format!("{:08}", rand::random::<u32>()),
+            volume: rand::random_range(1..100),
         };
-        {
-            debug!(
-                "{} -> {}",
-                market_quote.instrument_id, market_quote.last_price
-            );
-            let tdapi = &api;
-            if let Err(e) = tdapi.insert_market_quote(&market_quote) {
-                eprintln!("Error inserting market quote: {:?}", e);
-            }
+        debug!(
+            "{} -> {}",
+            market_quote.instrument_id, market_quote.last_price
+        );
+        if let Err(e) = api.insert_market_quote(&market_quote) {
+            eprintln!("Error inserting market quote: {:?}", e);
         }
     }
 }
@@ -186,7 +180,7 @@ impl LocalCTP {
         input.OrderRef.assign_from_str(&format!("{order_ref}"));
         let ret = self.tdapi.req_order_insert(&mut input, n_request_id);
         if ret != 0 {
-            println!("td.order_insert {}", ret);
+            error!("td.order_insert {}", ret);
             return Err(format!("req_order_insert error: {}", ret));
         }
         Ok(())
@@ -198,7 +192,7 @@ async fn insert_limit_order(api: Arc<Box<LocalCTP>>, account_config: &CtpAccount
     let broker_id = &account_config.broker_id;
     let account = &account_config.account;
     let exchange = "SHFE"; // Shanghai Futures Exchange, adjust as needed
-    let symbol = "ag2406"; // Example futures contract for copper, adjust as needed
+    let symbol = "ag2506"; // Example futures contract for copper, adjust as needed
     let price = 50000.0; // Example price, adjust as needed
     let volume = 1; // Example volume, adjust as needed
     let order_ref = 123; // This should be a unique reference for the order, possibly incrementing
@@ -227,8 +221,8 @@ async fn insert_limit_order(api: Arc<Box<LocalCTP>>, account_config: &CtpAccount
 
     // Check the result of the order insertion
     match result {
-        Ok(_) => println!("Order successfully inserted."),
-        Err(e) => println!("Error inserting order: {:?}", e),
+        Ok(_) => debug!("Order successfully inserted."),
+        Err(e) => error!("Error inserting order: {:?}", e),
     }
 }
 
@@ -263,8 +257,13 @@ pub async fn query(ctp_account: &CtpAccountConfig) {
         request_id += 1;
         request_id
     };
-    let dynlib_path = "./lib/libthosttraderapi_se_v6.7.2_localctp.so";
-    let (localctp, mut spi_stream) = create_localctp_and_spi(dynlib_path, "./td_");
+    #[cfg(target_os = "linux")]
+    let dynlib_path = "./lib/libthosttraderapi_se_v6.7.2.so";
+    #[cfg(target_os = "macos")]
+    let dynlib_path = "./lib/libthosttraderapi_se_v6.7.2.dylib";
+    // let dynlib_path = "./lib/libthosttraderapi_se.dylib";
+
+    let (localctp, mut spi_stream) = create_localctp_and_spi(dynlib_path, "");
     // let mut localctp = LocalCTP::create(dynlib_path, "./td_con_");
     println!("LocalCTP version: {}", localctp.tdapi.get_api_version());
     debug!("register name_server {:#?}", name_server);

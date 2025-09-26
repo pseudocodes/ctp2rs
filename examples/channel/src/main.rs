@@ -161,7 +161,7 @@ pub fn run_channel_md() {
     }
     let mut req = CThostFtdcReqUserLoginField::default();
     req.BrokerID.assign_from_str("9999");
-    let user_id = var("SIMNOW_USER_ID").unwrap();
+    let user_id = var("SIMNOW_USER_ID"). unwrap();
     req.UserID.assign_from_str(&user_id);
 
     mdapi.req_user_login(&mut req, 1);

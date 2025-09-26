@@ -1,10 +1,15 @@
 
-[![Ask DeepWiki]][deepwiki] [![Crates.io Version]][crates.io]
+[![GitHub Site]][github] [![Crates.io Version]][crates.io] [![Ask DeepWiki]][deepwiki] [![Rust DOC]][rust doc link]
 
 [Crates.io Version]: https://img.shields.io/crates/v/ctp2rs
 [crates.io]: https://crates.io/crates/ctp2rs
+[Github Site]: https://img.shields.io/badge/Github-pseudocodes/ctp2rs-green&logo=github
+[github]: https://github.com/pseudocodes/ctp2rs
 [Ask DeepWiki]: https://deepwiki.com/badge.svg
 [deepwiki]: https://deepwiki.com/pseudocodes/ctp2rs
+[Rust Doc]: https://img.shields.io/docsrs/ctp2rs/latest
+[rust doc link]: https://docs.rs/ctp2rs
+
 
 # Ctp2rs
 
@@ -119,7 +124,7 @@ cargo run --example <example>
 |9| ctp-futures|[github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)|[ctp-futures](https://crates.io/crates/ctp-futures)| Win64/Linux |rust-share 的分支实现 |
 |10| localctp-sys| [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)|[localctp-sys](https://crates.io/crates/localctp-sys)| Win64/Linux| rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本|
 |11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|[rptx](https://crates.io/crates/rtpx)| Linux| `1` 分支实现, 仅实现了 TraderApi 绑定|
-|12| ctp-rs| [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)|[ctp-rs](https://crates.io/crates/ctp-rs)| Win64/Linux| 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本|
+|12| rn7s2/ctp-rs| [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)|[ctp-rs](https://crates.io/crates/ctp-rs)| Win64/Linux| 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本|
 
 
 

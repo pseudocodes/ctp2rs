@@ -133,6 +133,7 @@ use std::{{
     os::raw::c_char,
     path::Path,
     ptr::null_mut,
+    sync::atomic::{{AtomicBool, Ordering}},
 }};
 
 use libloading::Library;
@@ -154,6 +155,7 @@ pub struct {trait_name} {{
     pub api_ptr: *mut {api_class},
     pub spi_ptr: Cell<* mut {spi_name}Ext>,
     pub dynlib: Option<Library>,          
+    pub released: AtomicBool,
 }}
 
 unsafe impl Sync for {trait_name} {{}}
@@ -563,16 +565,71 @@ pub fn _convert_api_general_func(ctx: &Context, e: &Entity, params: &ParamVec) -
     )
 }
 
+pub fn _convert_api_release_func(ctx: &Context, e: &Entity, params: &ParamVec) -> String {
+    let method_call = e.get_name().unwrap();
+    let method_name = match &ctx.cfg.method_to_snake {
+        true => rustify_method_name2(&method_call),
+        _ => method_call.clone(),
+    };
+    let api_class = &ctx.cfg.source_class_name;
+    let comment = match &ctx.cfg.generate_comments {
+        true => e.get_comment().unwrap_or("".to_string()),
+        _ => "".to_string(),
+    };
+
+    let self_text = match &ctx.cfg.prefer_self_mut_ref {
+        true => "&mut self",
+        _ => "&self",
+    };
+    let (self_p0, self_p1) = if ctx.cfg.wrap_api_struct {
+        ("self.api_ptr".to_string(), "self.api_ptr".to_string())
+    } else {
+        (
+            "self".to_string(),
+            format!("self as *mut {}", ctx.cfg.source_class_name),
+        )
+    };
+    let mut arg_vec = params
+        .iter()
+        .map(|x| format!("{}: {}", x.0, x.1))
+        .collect::<Vec<String>>();
+    arg_vec.insert(0, self_text.to_string());
+    let args_text = arg_vec.join(", ");
+
+    let mut param_vec = params
+        .iter()
+        .map(|x| format!("{}", x.2))
+        .collect::<Vec<String>>();
+    param_vec.insert(0, self_p1.to_string());
+    let params_text = param_vec.join(", ");
+
+    format!(
+        r#"    {comment}
+    pub fn {method_name}({args_text}) {{
+        // 只调用一次底层 Release
+        if !self.released.swap(true, Ordering::SeqCst) {{
+            unsafe {{
+                if !{self_p0}.is_null() {{
+                    ((*(*{self_p0}).vtable_).{api_class}_Release)({params_text});
+                }}
+            }}
+        }}
+    }}
+    "#
+    )
+}
+
 pub fn convert_api_trait_func_(ctx: &Context, e: &Entity, params: &ParamVec) -> Vec<String> {
     let func_name = e.get_name().unwrap();
 
-    if func_name.contains("Subscribe") && params[0].1.contains("Vec") {
+    if func_name.contains("Subscribe") && params[0].1.contains("[String]") {
         return vec![_convert_api_incomplete_array_func(ctx, e, params)];
     }
 
     let func_code = match func_name.as_str() {
         "RegisterFront" | "RegisterNameServer" => _convert_api_char_s_func(ctx, e, params),
         "RegisterSpi" => _convert_api_registerspi_func(ctx, e, params),
+        "Release" => _convert_api_release_func(ctx, e, params),
         _ => _convert_api_general_func(ctx, e, params),
     };
     vec![func_code]
@@ -899,10 +956,7 @@ pub fn convert_incomplete_array(
                 pn,
             ),
         ),
-        false => (
-            format!("&Vec<String>"),
-            format!(".as_ptr() as *mut *mut i8"),
-        ),
+        false => (format!("&[String]"), format!(".as_ptr() as *mut *mut i8")),
     };
     (pn, type_text, param_call)
 }
