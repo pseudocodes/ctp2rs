@@ -21,3 +21,12 @@ target/
 .DS_Store
 
 *.con
+*.db
+# Dynamic library binaries
+*.dylib
+*.so
+*.dll
+
+# Project analysis documents (local only)
+PROJECT_DEFECTS.md
+PROJECT_ANALYSIS.md

@@ -152,9 +152,14 @@ pub fn prepare_stream_spi_code(e: &Entity) -> String {
 use futures::stream::Stream;
 use std::{{
     pin::Pin,
-    sync::{{Arc, Mutex}},
+    sync::Arc,
     task::Waker,
 }};
+
+use parking_lot::Mutex;
+
+/// SPI 事件流的默认缓冲区容量上限
+const DEFAULT_STREAM_BUFFER_CAPACITY: usize = 65536;
 
 use crate::{version}::bindings::*;
 use crate::{version}::event::*;
@@ -178,6 +183,7 @@ pub fn handle_module_spi_stream(ctx: &Context, e: &Entity, items: &ItemVec) -> S
 pub struct {spi_trait}Inner {{
     buf: std::collections::VecDeque<{spi_trait}Event>,
     waker: Option<Waker>,
+    capacity: usize,
 }}
 
 impl {spi_trait}Inner {{
@@ -185,10 +191,24 @@ impl {spi_trait}Inner {{
         Self {{
             buf: std::collections::VecDeque::new(),
             waker: None,
+            capacity: DEFAULT_STREAM_BUFFER_CAPACITY,
+        }}
+    }}
+
+    /// 创建指定缓冲区容量的 Inner
+    pub fn with_capacity(capacity: usize) -> Self {{
+        Self {{
+            buf: std::collections::VecDeque::with_capacity(capacity.min(1024)),
+            waker: None,
+            capacity,
         }}
     }}
 
     fn push(&mut self, msg: {spi_trait}Event) {{
+        // 背压控制：缓冲区满时丢弃最旧的事件
+        while self.buf.len() >= self.capacity {{
+            self.buf.pop_front();
+        }}
         self.buf.push_back(msg);
         if let Some(waker) = self.waker.take() {{
             waker.wake()
@@ -216,7 +236,7 @@ impl Stream for {spi_trait}Stream {{
         cx: &mut futures::task::Context<'_>,
     ) -> futures::task::Poll<Option<Self::Item>> {{
         use futures::task::Poll;
-        let mut inner = self.inner.lock().unwrap();
+        let mut inner = self.inner.lock();
         if let Some(i) = inner.buf.pop_front() {{
             Poll::Ready(Some(i))
         }} else {{
@@ -279,7 +299,7 @@ pub fn convert_stream_spi_trait_func_(ctx: &Context, e: &Entity, params: &ParamV
     let trait_method_code = format!(
         r#"   
     fn {method_name}({arg_list}) {{
-        self.inner.lock().unwrap().push({spi_trait}Event::{method_call}(
+        self.inner.lock().push({spi_trait}Event::{method_call}(
             {spi_trait}{method_call}Event {{ 
 {field_code} 
             }}

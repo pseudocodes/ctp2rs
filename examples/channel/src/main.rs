@@ -161,7 +161,7 @@ pub fn run_channel_md() {
     }
     let mut req = CThostFtdcReqUserLoginField::default();
     req.BrokerID.assign_from_str("9999");
-    let user_id = var("SIMNOW_USER_ID"). unwrap();
+    let user_id = var("SIMNOW_USER_ID").unwrap();
     req.UserID.assign_from_str(&user_id);
 
     mdapi.req_user_login(&mut req, 1);
@@ -169,7 +169,7 @@ pub fn run_channel_md() {
     match rx.recv_timeout(std::time::Duration::from_secs(5)) {
         Err(_) => error!("Timeout try recv `req_user_login`"),
         Ok(MdSpiEvent::OnRspUserLogin(rsp)) => {
-            let instrument_ids = vec!["ag2512".to_string(), "fu2601".to_string()];
+            let instrument_ids = vec!["ag2604".to_string(), "fu2605".to_string()];
             mdapi.subscribe_market_data(&instrument_ids);
         }
         Ok(event) => {

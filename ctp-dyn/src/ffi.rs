@@ -160,6 +160,36 @@ impl<const N: usize> WrapToString for &[i8; N] {
     }
 }
 
+/// 将 CTP 的 `[i8; N]` 字段（GB18030 编码）解码为 Rust UTF-8 字符串。
+///
+/// 与 `WrapToString` 功能相同，但方法名不与 `std::string::ToString` 冲突。
+pub trait DecodeString {
+    /// 解码为 UTF-8 字符串，解码失败时 panic
+    fn decode(&self) -> String;
+    /// 尝试解码为 UTF-8 字符串，解码失败时返回 Err
+    fn try_decode(&self) -> Result<String, String>;
+}
+
+impl<const N: usize> DecodeString for [i8; N] {
+    fn decode(&self) -> String {
+        gb18030_cstr_i8_to_str(self).unwrap().into_owned()
+    }
+
+    fn try_decode(&self) -> Result<String, String> {
+        gb18030_cstr_i8_to_str(self).map(|cow| cow.into_owned())
+    }
+}
+
+impl<const N: usize> DecodeString for &[i8; N] {
+    fn decode(&self) -> String {
+        gb18030_cstr_i8_to_str(*self).unwrap().into_owned()
+    }
+
+    fn try_decode(&self) -> Result<String, String> {
+        gb18030_cstr_i8_to_str(*self).map(|cow| cow.into_owned())
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct WrapString(pub String); // 包装 String
 
@@ -214,5 +244,61 @@ impl<const N: usize> WrapFrom<&[i8; N]> for String {
     fn wrap_from(value: &[i8; N]) -> Self {
         let str_ = gb18030_cstr_i8_to_str(value).expect("failed to decode");
         str_.into()
+    }
+}
+
+/// CTP 动态库类型
+#[derive(Debug, Clone, Copy)]
+pub enum DynLibKind {
+    /// 行情 API (thostmduserapi_se)
+    MdApi,
+    /// 交易 API (thosttraderapi_se)
+    TraderApi,
+}
+
+/// 根据平台和库类型，在指定目录下解析 CTP 动态库的完整路径。
+///
+/// # 平台规则
+/// - **Linux**: `<dir>/thostmduserapi_se.so` 或 `thosttraderapi_se.so`
+/// - **macOS**: 优先查找 `.framework/<name>` 结构，其次 `.dylib`
+/// - **Windows**: `<dir>/thostmduserapi_se.dll` 或 `thosttraderapi_se.dll`
+///
+/// # 示例
+/// ```no_run
+/// use ctp2rs::ffi::{resolve_dynlib_path, DynLibKind};
+/// let path = resolve_dynlib_path("./api/ctp/v6.7.2/v6.7.2_linux64", DynLibKind::MdApi);
+/// ```
+pub fn resolve_dynlib_path<P: AsRef<std::path::Path>>(
+    dir: P,
+    kind: DynLibKind,
+) -> std::path::PathBuf {
+    let dir = dir.as_ref();
+    let lib_name = match kind {
+        DynLibKind::MdApi => "thostmduserapi_se",
+        DynLibKind::TraderApi => "thosttraderapi_se",
+    };
+
+    #[cfg(target_os = "linux")]
+    {
+        dir.join(format!("{}.so", lib_name))
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        dir.join(format!("{}.dll", lib_name))
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        // macOS: 优先检查 .framework 结构
+        let framework_path = dir.join(format!(
+            "{}.framework/{}",
+            lib_name, lib_name
+        ));
+        if framework_path.exists() {
+            return framework_path;
+        }
+        // 其次 .dylib
+        dir.join(format!("{}.dylib", lib_name))
     }
 }
