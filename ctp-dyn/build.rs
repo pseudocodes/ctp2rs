@@ -17,6 +17,32 @@ macro_rules! p {
     }
 }
 fn get_sdk_path() -> &'static std::path::Path {
+    // Feature 互斥检查：同一时间只能启用一个 CTP 版本
+    let version_features: &[(&str, bool)] = &[
+        ("ctp_v6_7_2", cfg!(feature = "ctp_v6_7_2")),
+        ("ctp_v6_7_7", cfg!(feature = "ctp_v6_7_7")),
+        ("ctp_v6_7_8", cfg!(feature = "ctp_v6_7_8")),
+        ("ctp_v6_7_9", cfg!(feature = "ctp_v6_7_9")),
+        ("ctp_v6_7_11", cfg!(feature = "ctp_v6_7_11")),
+        ("mini_v1_6_9", cfg!(feature = "mini_v1_6_9")),
+        ("mini_v1_7_0", cfg!(feature = "mini_v1_7_0")),
+        ("sopt_v3_7_3", cfg!(feature = "sopt_v3_7_3")),
+    ];
+    let enabled: Vec<&str> = version_features
+        .iter()
+        .filter(|(_, enabled)| *enabled)
+        .map(|(name, _)| *name)
+        .collect();
+    if enabled.len() > 1 {
+        p!(
+            "WARNING: Multiple CTP version features enabled simultaneously: [{}]. \
+             This may be caused by Cargo workspace feature unification. \
+             The first matched version will be used. \
+             For correct behavior, build specific packages with `cargo build -p <package>`.",
+            enabled.join(", ")
+        );
+    }
+
     // 基于版本的分支判断
 
     if cfg!(feature = "mini_v1_6_9") {

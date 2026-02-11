@@ -1,5 +1,30 @@
 # Changelog
 
+## [Unreleased] - 2026-02-11
+
+### Fixed
+- 修复 `MdApi::default()` / `TraderApi::default()` 零初始化 UB，改为安全的字段级初始化
+- `Cell<*mut T>` 替换为 `AtomicPtr<T>`，消除 `unsafe impl Sync` 下的数据竞争风险
+- 修复 Drop 中 Release 与 SPI 释放的竞态风险，调整为先 Release 再释放 SPI 内存
+- Stream 的 `std::sync::Mutex` 替换为 `parking_lot::Mutex`，消除 poison panic 风险
+- 修复 `MdApiBuilder::build()` 在 union 分支中未保存 dynlib 导致动态库提前卸载的问题
+
+### Changed
+- Subscribe/Unsubscribe 系列方法参数类型从 `&[String]` 改为 `&[impl AsRef<str>]`
+- Stream 缓冲区新增有界队列背压控制（默认容量 65536，满时丢弃最旧事件）
+- `build.rs` 新增 CTP 版本 feature 互斥检测，同时启用多个版本时发出编译警告
+- `MdApiBuilder` / `TraderApiBuilder` 的 `with_dynlib` 方法参数改为 `AsRef<Path>`
+- `MdApiBuilder::Default` 手动实现，确保 `use_production_mode` 默认为 `true`
+- `.gitignore` 新增 `*.dylib` 及项目分析文档的忽略规则
+
+### Added
+- `register_spi` 方法新增 `/// # Safety` 文档注释，明确调用者的生命周期责任
+- `ffi.rs` 新增 `DecodeString` trait（`decode()` / `try_decode()`），不与 `std::toString` 冲突
+- `ffi.rs` 新增 `DynLibKind` 枚举和 `resolve_dynlib_path()` 工具函数，统一跨平台动态库路径解析
+- 新增 `TraderApiBuilder`，与 `MdApiBuilder` 对称的交易 API 构建器
+- `builder.rs` 全部公开方法和结构体新增文档注释及示例
+- 新增 `parking_lot` 依赖
+
 ## [Unreleased] - 2025-09-26
 ### Changed
 -  Readme 更新
