@@ -98,7 +98,7 @@ See [/examples](../examples) for various uses of *`Ctp2rs`*. You can run them wi
 cargo run --example <example>
 ```
 - [channel](../examples/channel/): 采用 channel 来获取行情，支持 MacOS 以及 Linux 
-- [localctp](../examples/localctp/): 运行 localctp 的一个样例，支持 Linux
+- [localctp](../examples/localctp/): 运行 localctp 的一个样例，支持 Linux，localctp 库提供特殊定制，支持共享内存导入行情
 - [openctp](../examples/openctp): 连接 openctp 模拟平台的行情以及交易样例，支持 MacOS 以及 Linux 
 - [insecure](../examples/insecure): 可跨版本加载动态方案 POC Demo, 适用 Linux
 - [tts_sopt](../examples/tts_sopt): ctp-sopt 连接 openctp 股票期权仿真环境 demo 
@@ -118,21 +118,22 @@ cargo run --example <example>
 |3| rust-share | [github.com/mineralres/rust-share](https://github.com/mineralres/rust-share) | N/A| Win64/Linux | 首个提供了构建时解析 CTP 头文件并生成 Rust 封装代码的功能的项目，同时提供了异步 Stream 调用接口功能 |
 |4| gqf2008/ctp-rs| [github.com/gqf2008/ctp-rs](https://github.com/gqf2008/ctp-rs) |N/A | Win64/Linux| 类似`2`, 采用 C++ 代码辅助封装 |
 |5| libctp-sys| [github.com/unknown-marketwizards/libctp-sys](https://github.com/unknown-marketwizards/libctp-sys)| [libctp-sys](https://crates.io/crates/libctp-sys)| Win64/Linux | 类似`2`, 采用 C++ 代码辅助封装 |
-|6| ctp-rust| [github.com/kozyan/ctp-rust](https://github.com/kozyan/ctp-rust)| N/A |Win64/Linux   | `2` 的分支项目 |
+|6| kozyn/ctp-rust| [github.com/kozyan/ctp-rust](https://github.com/kozyan/ctp-rust)| N/A |Win64/Linux   | `2` 的分支项目 |
 |7| ctp-alone | [github.com/calebx/ctp-alone](https://github.com/calebx/ctp-alone)| N/A |Win64/Linux | `1` 的分支项目 |
 |8| ctp-sys | [https://github.com/daedalus2022/ctp-sys](https://github.com/daedalus2022/ctp-sys) |[ctp-sys](https://crates.io/crates/ctp-sys)| Win64/Linux| rust-share 的分支实现 |
 |9| ctp-futures|[github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)|[ctp-futures](https://crates.io/crates/ctp-futures)| Win64/Linux |rust-share 的分支实现 |
 |10| localctp-sys| [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)|[localctp-sys](https://crates.io/crates/localctp-sys)| Win64/Linux| rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本|
 |11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|[rptx](https://crates.io/crates/rtpx)| Linux| `1` 分支实现, 仅实现了 TraderApi 绑定|
 |12| rn7s2/ctp-rs| [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)|[ctp-rs](https://crates.io/crates/ctp-rs)| Win64/Linux| 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本|
-
+|13| myctp-rs  | [https://github.com/shawn666liu/myctp-rs](https://github.com/shawn666liu/myctp-rs)| N/A | Win64/Linux| 基于作者的纯 C 封装项目 [ftdc2c_ctp](https://github.com/shawn666liu/ftdc2c_ctp) 之上的 Rust 封装，项目尝试提供多种高度抽象的封装范式，编译构建较为繁琐，建议采用大模型解读|
+|14| deepissue/ctp-rust| [https://github.com/deepissue/ctp-rust](https://github.com/deepissue/ctp-rust) | [ctp-rust](https://crates.io/crates/ctp-rust)|Linux/MacOS | 项目封装方案估计由大模型提供，未清晰理解 CTP 具体环境和业务状态，仅从 rust 语言层面提供了技术封装方案，接口 api 函数未全部实现封装，代码存有 TODO, MacOS 接口封装无法通过穿透式认证|
 
 
 ### Potential Issues
 * 以上项目均为静态编译项目，构建过程中需要二进制库参与编译，项目运行时需要通过环境变量指定动态库加载位置
 * 当 CTP 升级版本时，开发者需要自行重新构建项目，用以升级依赖的 Cpp 头文件和依赖库
 * 同上，当需要切换 CTP API 柜台时，部署时需要通过环境变量替换动态库，无法在同一个进程中访问多种柜台
-* 基本不支持 MacOS 平台
+* 较少项目支持 MacOS 平台
   
   
 ## Development Environment
