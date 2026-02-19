@@ -19,6 +19,8 @@ exclude = [
     "*.so",
     "*.dll",
     "*.lib",
+    "codegen/*.md",
+    "src/v1alpha1/generated/README.md",
 ]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
