@@ -1,4 +1,4 @@
-#![allow(unused_variables, unused_macros, unreachable_code)]
+#![allow(unreachable_code)]
 use std::env;
 use std::env::var;
 
@@ -205,11 +205,10 @@ fn build_dyn() {
         )
         .unwrap();
     }
-    generate_mduser_wrapper_code(&tu.get_entity(), &out_path);
-    generate_trader_wrapper_code(&tu.get_entity(), &out_path);
-    generate_stream_wrapper_code(&tu.get_entity(), &out_path);
+    generate_mduser_wrapper_code(&tu.get_entity(), &out_path, &CodegenConfig::default());
+    generate_trader_wrapper_code(&tu.get_entity(), &out_path, &CodegenConfig::default());
 
-    if let Err(err) = generate_errors_wrapper_code(sdk_path.join("error.xml"), &out_path) {
+    if let Err(_err) = generate_errors_wrapper_code(sdk_path.join("error.xml"), &out_path) {
         // panic!("Failed to generate errors wrapper code: {}", err);
     }
 

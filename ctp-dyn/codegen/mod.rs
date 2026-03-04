@@ -1,80 +1,55 @@
-#![allow(unused_variables, unused_macros)]
-#![allow(unused_imports, unused_parens)]
-#![allow(dead_code)]
 pub mod errors;
+pub mod generator;
+pub mod naming;
 pub mod parser;
-pub mod setting;
-pub mod stream;
 
-use std::{
-    env,
-    fs::File,
-    io::Write,
-    path::{Path, PathBuf},
-};
+use std::env;
+use std::fs;
+use std::path::{Path, PathBuf};
 
 use clang::Entity;
-pub use errors::*;
-pub use parser::*;
-pub use setting::*;
-pub use stream::*;
 
-pub fn generate_trader_wrapper_code<P: AsRef<Path>>(e: &Entity, target_dir: P) {
-    let mut cfg = Config::for_api();
-    cfg.source_class_name = "CThostFtdcTraderApi".to_string();
-    cfg.generate_trait_name = "TraderApi".to_string();
-    cfg.wrap_spi_trait = "TraderSpi".to_string();
+pub use errors::generate_errors_wrapper_code;
+use parser::ApiKind;
+pub use parser::CodegenConfig;
 
-    let mut ctx = setting::Context::for_api(cfg);
+/// 生成 Trader API/SPI 文件
+pub fn generate_trader_wrapper_code<P: AsRef<Path>>(
+    entity: &Entity,
+    out_dir: P,
+    config: &CodegenConfig,
+) {
+    let kind = ApiKind::Trader;
 
-    let api_code = prepare_api_wrapper_code(&mut ctx, e);
+    let api_methods = parser::extract_methods(entity, kind.api_class(), config);
+    let spi_methods = parser::extract_methods(entity, kind.spi_class(), config);
 
-    let mut cfg = setting::Config::for_spi();
-    cfg.source_class_name = "CThostFtdcTraderSpi".to_string();
-    cfg.generate_trait_name = "TraderSpi".to_string();
-    cfg.wrap_spi_trait = "TraderSpi".to_string();
-    let mut ctx = setting::Context::for_spi(cfg);
+    let api_code = generator::generate_api_file(kind, &api_methods, config);
+    let spi_code = generator::generate_spi_file(kind, &spi_methods, config);
 
-    let spi_code = prepare_spi_wrapper_code(&mut ctx, e);
-    let mut file =
-        File::create(target_dir.as_ref().join("traderapi.rs")).expect("create file error");
-    file.write_all(api_code.as_bytes())
-        .expect("write code failed!");
-
-    let mut file =
-        File::create(target_dir.as_ref().join("traderspi.rs")).expect("create file error");
-    file.write_all(spi_code.as_bytes())
-        .expect("write code failed!");
+    fs::write(out_dir.as_ref().join("traderapi.rs"), api_code).expect("写入 traderapi.rs 失败");
+    fs::write(out_dir.as_ref().join("traderspi.rs"), spi_code).expect("写入 traderspi.rs 失败");
 }
 
-pub fn generate_mduser_wrapper_code<P: AsRef<Path>>(e: &Entity, target_dir: P) {
-    let mut cfg = Config::for_api();
-    cfg.source_class_name = "CThostFtdcMdApi".to_string();
-    cfg.generate_trait_name = "MdApi".to_string();
-    cfg.wrap_spi_trait = "MdSpi".to_string();
+/// 生成 MdUser API/SPI 文件
+pub fn generate_mduser_wrapper_code<P: AsRef<Path>>(
+    entity: &Entity,
+    out_dir: P,
+    config: &CodegenConfig,
+) {
+    let kind = ApiKind::Md;
 
-    let mut ctx = setting::Context::for_api(cfg);
+    let api_methods = parser::extract_methods(entity, kind.api_class(), config);
+    let spi_methods = parser::extract_methods(entity, kind.spi_class(), config);
 
-    let api_code = prepare_api_wrapper_code(&mut ctx, e);
+    let api_code = generator::generate_api_file(kind, &api_methods, config);
+    let spi_code = generator::generate_spi_file(kind, &spi_methods, config);
 
-    let mut cfg = setting::Config::for_spi();
-    cfg.source_class_name = "CThostFtdcMdSpi".to_string();
-    cfg.generate_trait_name = "MdSpi".to_string();
-    cfg.wrap_spi_trait = "MdSpi".to_string();
-    let mut ctx = setting::Context::for_spi(cfg);
-
-    let spi_code = prepare_spi_wrapper_code(&mut ctx, e);
-    let mut file = File::create(target_dir.as_ref().join("mdapi.rs")).expect("create file error");
-    file.write_all(api_code.as_bytes())
-        .expect("write code failed!");
-
-    let mut file = File::create(target_dir.as_ref().join("mdspi.rs")).expect("create file error");
-    file.write_all(spi_code.as_bytes())
-        .expect("write code failed!");
+    fs::write(out_dir.as_ref().join("mdapi.rs"), api_code).expect("写入 mdapi.rs 失败");
+    fs::write(out_dir.as_ref().join("mdspi.rs"), spi_code).expect("写入 mdspi.rs 失败");
 }
 
 pub fn get_ctp_include_path() -> Result<PathBuf, String> {
-    // 从环境变量读取路径
     let path_str = env::var("CTP_API_INCLUDE_DIR")
         .map_err(|_| "Environment variable `CTP_API_INCLUDE_DIR` not found".to_string())?;
 

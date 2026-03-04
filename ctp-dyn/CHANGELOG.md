@@ -1,5 +1,25 @@
 # Changelog
 
+## [Unreleased] - 2026-03-04
+
+### Changed
+- **codegen 架构重构**：从 handler 注册表 + 多 Pass 遍历架构重构为 IR 管线（AST → MethodInfo → Rust code），codegen 源码从约 1920 行精简至约 1080 行（减少约 44%）
+- **codegen 模块重组**：删除 `setting.rs`（Config/Context/Handler）和原 `parser.rs`（1029 行单体文件），拆分为职责清晰的三个模块：
+  - `parser.rs` — IR 数据结构定义 + C++ AST 提取
+  - `generator.rs` — IR → Rust 代码生成
+  - `naming.rs` — XML 错误 ID → Rust 枚举名转换
+- **移除 event/stream 代码生成**：构建期不再生成 `event.rs` 和 `stream.rs`（`MdSpiEvent`/`TraderSpiEvent` 枚举及 `futures::Stream` 异步流封装）；用户可在应用层通过 `std::sync::mpsc` 自行实现等效功能（参见 `examples/channel`）
+- **示例适配**：`examples/channel` 改用本地 `MdEvent` 枚举 + `std::sync::mpsc::sync_channel`；`examples/localctp` 改用本地 `ChannelTraderSpi` + `TraderEvent` 枚举，通过 `mpsc::unbounded_channel` 桥接 tokio
+- **生成代码展示方式变更**：`generated/` 目录下的 `.rs` 文件替换为 `README.md`，以代码块引用方式展示各生成文件节选，重点标注跨平台签名差异（如 macOS `ReqUserLogin` 额外的 `length`/`systemInfo` 参数），避免误导 AI agent 或开发者将展示文件当作编译源码
+
+### Removed
+- `codegen/setting.rs`、`codegen/stream.rs`
+- `futures`、`parking_lot` 运行时依赖
+- `examples/localctp` 的 `futures` 依赖
+- `errors.rs` 中未使用的编码检测函数（`read_file_with_encoding_detection`、`extract_encoding_from_xml_declaration`、`detect_encoding`）
+- `generated/` 目录下的 `.rs` 展示文件
+
+
 ## [Unreleased] - 2026-02-11
 
 ### Fixed

@@ -1,4 +1,4 @@
-#![allow(unused_variables)]
+#![allow(unused_variables, dead_code)]
 use std::{
     env::var,
     path::Path,
@@ -9,25 +9,41 @@ use ctp2rs::ffi::{gb18030_cstr_i8_to_str, AssignFromString, WrapToString};
 use ctp2rs::{print_rsp_info, v1alpha1::*};
 use log::*;
 
+/// 自定义行情事件枚举，替代已移除的 MdSpiEvent
+#[derive(Debug)]
+enum MdEvent {
+    FrontConnected,
+    FrontDisconnected(i32),
+    RspUserLogin {
+        rsp_user_login: Option<CThostFtdcRspUserLoginField>,
+        rsp_info: Option<CThostFtdcRspInfoField>,
+        request_id: i32,
+        is_last: bool,
+    },
+    RspSubMarketData {
+        specific_instrument: Option<CThostFtdcSpecificInstrumentField>,
+        rsp_info: Option<CThostFtdcRspInfoField>,
+        request_id: i32,
+        is_last: bool,
+    },
+    RtnDepthMarketData {
+        depth_market_data: Option<CThostFtdcDepthMarketDataField>,
+    },
+}
+
 pub struct ChannelSpi {
-    tx: SyncSender<MdSpiEvent>,
+    tx: SyncSender<MdEvent>,
 }
 
 impl MdSpi for ChannelSpi {
     fn on_front_connected(&mut self) {
         debug!("on_front_connected");
-        self.tx
-            .send(MdSpiEvent::OnFrontConnected(MdSpiOnFrontConnectedEvent {}))
-            .unwrap();
+        self.tx.send(MdEvent::FrontConnected).unwrap();
     }
 
     fn on_front_disconnected(&mut self, reason: i32) {
         debug!("on_front_disconnected {}", reason);
-        self.tx
-            .send(MdSpiEvent::OnFrontDisconnected(
-                MdSpiOnFrontDisconnectedEvent { reason: reason },
-            ))
-            .unwrap();
+        self.tx.send(MdEvent::FrontDisconnected(reason)).unwrap();
     }
 
     fn on_heart_beat_warning(&mut self, time_lapse: i32) {
@@ -43,12 +59,12 @@ impl MdSpi for ChannelSpi {
     ) {
         debug!("on_rsp_user_login");
         self.tx
-            .send(MdSpiEvent::OnRspUserLogin(MdSpiOnRspUserLoginEvent {
+            .send(MdEvent::RspUserLogin {
                 rsp_user_login: rsp_user_login.cloned(),
                 rsp_info: rsp_info.cloned(),
                 request_id,
                 is_last,
-            }))
+            })
             .unwrap();
     }
 
@@ -69,16 +85,21 @@ impl MdSpi for ChannelSpi {
         request_id: i32,
         is_last: bool,
     ) {
-        debug!("on_rsp_sub_market_data");
+        debug!(
+            "on_rsp_sub_market_data {}",
+            specific_instrument
+                .as_ref()
+                .unwrap()
+                .InstrumentID
+                .to_string()
+        );
         self.tx
-            .send(MdSpiEvent::OnRspSubMarketData(
-                MdSpiOnRspSubMarketDataEvent {
-                    specific_instrument: specific_instrument.cloned(),
-                    rsp_info: rsp_info.cloned(),
-                    request_id: request_id,
-                    is_last: is_last,
-                },
-            ))
+            .send(MdEvent::RspSubMarketData {
+                specific_instrument: specific_instrument.cloned(),
+                rsp_info: rsp_info.cloned(),
+                request_id,
+                is_last,
+            })
             .unwrap();
     }
 
@@ -87,11 +108,9 @@ impl MdSpi for ChannelSpi {
         depth_market_data: Option<&CThostFtdcDepthMarketDataField>,
     ) {
         self.tx
-            .send(MdSpiEvent::OnRtnDepthMarketData(
-                MdSpiOnRtnDepthMarketDataEvent {
-                    depth_market_data: depth_market_data.cloned(),
-                },
-            ))
+            .send(MdEvent::RtnDepthMarketData {
+                depth_market_data: depth_market_data.cloned(),
+            })
             .unwrap();
     }
 }
@@ -135,7 +154,7 @@ pub fn run_channel_md() {
     let mdapi = MdApi::create_api(dynlib_path, "./md_", false, false, true);
 
     let (tx, rx) = mpsc::sync_channel(1024);
-    let mdspi = ChannelSpi { tx: tx };
+    let mdspi = ChannelSpi { tx };
     let mdspi_box = Box::new(mdspi);
 
     println!("get_api_version: {}", mdapi.get_api_version());
@@ -153,7 +172,7 @@ pub fn run_channel_md() {
 
     match rx.recv_timeout(std::time::Duration::from_secs(5)) {
         Err(_) => error!("Timeout try recv `req_init`"),
-        Ok(MdSpiEvent::OnFrontConnected(_)) => {}
+        Ok(MdEvent::FrontConnected) => {}
         Ok(event) => {
             error!("invalid event: {:?}", event);
             return;
@@ -168,8 +187,8 @@ pub fn run_channel_md() {
 
     match rx.recv_timeout(std::time::Duration::from_secs(5)) {
         Err(_) => error!("Timeout try recv `req_user_login`"),
-        Ok(MdSpiEvent::OnRspUserLogin(rsp)) => {
-            let instrument_ids = vec!["ag2604".to_string(), "fu2605".to_string()];
+        Ok(MdEvent::RspUserLogin { .. }) => {
+            let instrument_ids = vec!["ag2606".to_string(), "fu2605".to_string()];
             mdapi.subscribe_market_data(&instrument_ids);
         }
         Ok(event) => {
@@ -180,8 +199,8 @@ pub fn run_channel_md() {
 
     while let Ok(event) = rx.recv() {
         match event {
-            MdSpiEvent::OnRtnDepthMarketData(event) => {
-                let q = event.depth_market_data.unwrap();
+            MdEvent::RtnDepthMarketData { depth_market_data } => {
+                let q = depth_market_data.unwrap();
                 info!(
                     "{} {} {} last_price: {}",
                     q.ActionDay.to_string(),
@@ -190,11 +209,15 @@ pub fn run_channel_md() {
                     q.LastPrice,
                 )
             }
-            MdSpiEvent::OnRspSubMarketData(event) => {
-                print_rsp_info!(event.rsp_info);
+            MdEvent::RspSubMarketData {
+                specific_instrument,
+                rsp_info,
+                ..
+            } => {
+                print_rsp_info!(rsp_info);
                 info!(
                     "on_rsp_sub_market_data: {}",
-                    event.specific_instrument.unwrap().InstrumentID.to_string()
+                    specific_instrument.unwrap().InstrumentID.to_string()
                 )
             }
             _ => debug!("Got event: {:?}", event),
@@ -202,8 +225,6 @@ pub fn run_channel_md() {
     }
     mdapi.join();
     let _ = unsafe { Box::from_raw(mdspi_ptr2) };
-
-    // Ok(())
 }
 
 fn main() {
