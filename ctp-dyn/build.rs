@@ -72,27 +72,33 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    if cfg!(feature = "ctp_v6_7_7") {
+    // ── CTP 主线版本（按优先级排列，非 default 版本优先）──
+    // 当 workspace feature unification 导致多个版本同时启用时，
+    // 非 default 版本（由 example 显式指定）应优先于 default 版本。
+    // 当前 default = ctp_v6_7_7，因此放在最后匹配。
+
+    if cfg!(feature = "ctp_v6_7_2") {
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi64_se_windows");
+        }
         if cfg!(feature = "openctp") {
-            panic!("`openctp` feature not supported for `v6_7_7`.");
+            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
         }
         if cfg!(target_os = "macos") {
-            return Path::new("./api/ctp/v6.7.7/v6.7.7_MacOS_20240716");
+            return Path::new("./api/ctp/v6.7.2/v6.7.2_MacOS_20231016");
         }
         if cfg!(target_os = "linux") {
-            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
-        }
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_traderapi64_se_windows/");
+            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
         }
     }
 
     if cfg!(feature = "ctp_v6_7_8") {
-        if cfg!(feature = "openctp") {
-            panic!("`openctp` feature not supported for `v6_7_8`.");
-        }
         if cfg!(target_os = "macos") {
-            panic!("`macOS platform` not supported for `v6_7_8`.");
+            // macOS 无原生 SDK，openctp 场景下使用 linux 头文件编译
+            if cfg!(feature = "openctp") {
+                return Path::new("./api/ctp/v6.7.8/v6.7.8_20240918_api_traderapi_se_linux64");
+            }
+            panic!("`macOS platform` not supported for `v6_7_8` without `openctp` feature.");
         }
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.8/v6.7.8_20240918_api_traderapi_se_linux64");
@@ -103,11 +109,12 @@ fn get_sdk_path() -> &'static std::path::Path {
     }
 
     if cfg!(feature = "ctp_v6_7_9") {
-        if cfg!(feature = "openctp") {
-            panic!("`openctp` feature not supported for `v6_7_9`.");
-        }
         if cfg!(target_os = "macos") {
-            panic!("`macOS platform` not supported for `v6_7_9`.");
+            // macOS 无原生 SDK，openctp 场景下使用 linux 头文件编译
+            if cfg!(feature = "openctp") {
+                return Path::new("./api/ctp/v6.7.9/v6.7.9_P1_20250319_api_traderapi_se_linux64/");
+            }
+            panic!("`macOS platform` not supported for `v6_7_9` without `openctp` feature.");
         }
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.9/v6.7.9_P1_20250319_api_traderapi_se_linux64/");
@@ -129,22 +136,22 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    if cfg!(feature = "ctp_v6_7_2") {
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi64_se_windows");
-        }
+    // default 版本放最后，仅在没有其他版本匹配时生效
+    // 当没有任何版本 feature 启用时，也 fallback 到此版本
+    if cfg!(target_os = "macos") {
         if cfg!(feature = "openctp") {
-            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
         }
-        if cfg!(target_os = "macos") {
-            return Path::new("./api/ctp/v6.7.2/v6.7.2_MacOS_20231016");
-        }
-        if cfg!(target_os = "linux") {
-            return Path::new("./api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64");
-        }
+        return Path::new("./api/ctp/v6.7.7/v6.7.7_MacOS_20240716");
+    }
+    if cfg!(target_os = "linux") {
+        return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+    }
+    if cfg!(target_os = "windows") {
+        return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_traderapi64_se_windows/");
     }
 
-    panic!("Either 'ctp_v6_7_2' or 'ctp_v6_7_7' feature must be enabled.");
+    panic!("Unsupported target platform.");
 }
 
 fn ensure_dir_exists(path: &PathBuf) -> io::Result<()> {

@@ -24,4 +24,4 @@ chrono = "0.4"
 
 tokio = { version = "1.43.1", features = ["full"] }
 [features]
-default = ["ctp2rs/default", "ctp2rs/openctp"]
+default = ["ctp2rs/ctp_v6_7_2", "ctp2rs/openctp"]

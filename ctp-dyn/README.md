@@ -49,7 +49,7 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段，或开发者可以采用环境变量来指定具体绑定的 CTP API 版本
 `0.1.7` 版本后将不再在项目中跟踪保存 CTP 各版本头文件，除遇各平台主要接口变更
 
-默认采用的 ctp sdk 版本停留在 `v6.7.2`，便于各个架构进行测试开发，`v6.7.11` 版本由于合并了生产和评测版本并在主创建实例接口添加了 `bIsProductionMode` 参数，所以需要在开发时用户自行指定;
+默认采用的 ctp sdk 版本使用 `v6.7.7`，便于各个架构进行测试开发，`v6.7.11` 版本由于合并了生产和评测版本并在主创建实例接口添加了 `bIsProductionMode` 参数，所以需要在开发时用户自行指定;
 
 ```toml
 [dependencies]
@@ -58,7 +58,7 @@ ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] }
 或者
 ```toml
 [dependencies]
-ctp2rs = { version = "0.1.8-alpha1", features = ["ctp_v6_7_11"] } 
+ctp2rs = { version = "0.1.10-alpha2", features = ["ctp_v6_7_11"] } 
 ```
 
 
@@ -126,13 +126,13 @@ cargo run --example <example>
 |11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|[rptx](https://crates.io/crates/rtpx)| Linux| `1` 分支实现, 仅实现了 TraderApi 绑定|
 |12| rn7s2/ctp-rs| [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)|[ctp-rs](https://crates.io/crates/ctp-rs)| Win64/Linux| 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本|
 |13| myctp-rs  | [https://github.com/shawn666liu/myctp-rs](https://github.com/shawn666liu/myctp-rs)| N/A | Win64/Linux| 基于作者的纯 C 封装项目 [ftdc2c_ctp](https://github.com/shawn666liu/ftdc2c_ctp) 之上的 Rust 封装，项目尝试提供多种高度抽象的封装范式，编译构建较为繁琐，建议采用大模型解读|
-|14| deepissue/ctp-rust| [https://github.com/deepissue/ctp-rust](https://github.com/deepissue/ctp-rust) | [ctp-rust](https://crates.io/crates/ctp-rust)|Linux/MacOS | 项目封装方案估计由大模型提供，未清晰理解 CTP 具体环境和业务状态，仅从 rust 语言层面提供了技术封装方案，接口 api 函数未全部实现封装，代码存有 TODO, MacOS 接口封装无法通过穿透式认证|
+|14| deepissue/ctp-rust| [https://github.com/deepissue/ctp-rust](https://github.com/deepissue/ctp-rust) | [ctp-rust](https://crates.io/crates/ctp-rust)|Linux/MacOS | [2025-09-25]项目封装方案估计由大模型提供，未清晰理解 CTP 具体环境和业务状态，仅从 rust 语言层面提供了技术封装方案，接口 api 函数未全部实现封装，代码存有 TODO, MacOS 接口封装无法通过穿透式认证|
 
 
 ### Potential Issues
 * 以上项目均为静态编译项目，构建过程中需要二进制库参与编译，项目运行时需要通过环境变量指定动态库加载位置
 * 当 CTP 升级版本时，开发者需要自行重新构建项目，用以升级依赖的 Cpp 头文件和依赖库
-* 同上，当需要切换 CTP API 柜台时，部署时需要通过环境变量替换动态库，无法在同一个进程中访问多种柜台
+* 同上，当需要切换 CTP API 供应商柜台时，部署时需要通过环境变量替换动态库，无法在同一个进程中访问多种柜台
 * 较少项目支持 MacOS 平台
   
   

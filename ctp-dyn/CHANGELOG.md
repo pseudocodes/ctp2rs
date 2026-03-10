@@ -1,5 +1,16 @@
 # Changelog
 
+## [Unreleased] - 2026-03-10
+
+### Changed
+- default feature 不再包含版本选择（移除 `ctp_v6_7_7`），`build.rs` 在无版本 feature 时自动 fallback 到 v6.7.7
+- `build.rs` 版本匹配优先级调整：显式指定的版本优先匹配，fallback 版本（v6.7.7）降至最后，缓解 Cargo workspace feature unification 导致的签名冲突
+- `ctp_v6_7_8` / `ctp_v6_7_9` 新增 openctp 支持，macOS 下使用对应版本的 Linux 头文件编译
+- macOS fallback 路径新增 openctp 判断，启用时使用 Linux 头文件
+- `localctp` 示例锁定 `ctp_v6_7_2` 版本
+- `openctp` 示例新增 `ctp_v6_7_8` / `ctp_v6_7_9` feature 选项 
+
+
 ## [Unreleased] - 2026-03-04
 
 ### Changed
