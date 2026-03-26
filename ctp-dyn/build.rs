@@ -23,6 +23,7 @@ fn get_sdk_path() -> &'static std::path::Path {
         ("ctp_v6_7_7", cfg!(feature = "ctp_v6_7_7")),
         ("ctp_v6_7_8", cfg!(feature = "ctp_v6_7_8")),
         ("ctp_v6_7_9", cfg!(feature = "ctp_v6_7_9")),
+        ("ctp_v6_7_10", cfg!(feature = "ctp_v6_7_10")),
         ("ctp_v6_7_11", cfg!(feature = "ctp_v6_7_11")),
         ("mini_v1_6_9", cfg!(feature = "mini_v1_6_9")),
         ("mini_v1_7_0", cfg!(feature = "mini_v1_7_0")),
@@ -114,6 +115,21 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
         if cfg!(target_os = "windows") {
             return Path::new("./api/ctp/v6.7.9/20250319_traderapi64_se_windows/");
+        }
+    }
+
+    if cfg!(feature = "ctp_v6_7_10") {
+        if cfg!(feature = "openctp") {
+            panic!("`openctp` feature not supported for `v6_7_10`.");
+        }
+        if cfg!(target_os = "macos") {
+            panic!("`macOS platform` not supported for `v6_7_10`.");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.10/v6.7.10_CP_20250415_api_traderapi_linux64/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.10/v6.7.10_CP_20250415_traderapi64_windows/");
         }
     }
 
