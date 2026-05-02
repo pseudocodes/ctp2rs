@@ -158,7 +158,10 @@ pub fn run_td(config: CtpAccountConfig) {
     tdapi.register_front(&front_address);
 
     tdapi.register_spi(tdspi_ptr);
+    #[cfg(not(feature = "ctp_v6_7_13"))]
     tdapi.subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);
+    #[cfg(feature = "ctp_v6_7_13")]
+    tdapi.subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK, 0);
     tdapi.subscribe_public_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);
 
     tdapi.init();

@@ -65,7 +65,7 @@ fn create_config_for_environment(
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so");
             #[cfg(all(target_os = "linux", feature = "ctp_v6_7_11"))]
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.11/v6.7.11_20250617_api_traderapi_se_linux64/thostmduserapi_se.so");
-
+            
             #[cfg(all(target_os = "windows", not(feature = "ctp_v6_7_11")))]
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_win64/thostmduserapi_se.dll");
             #[cfg(all(target_os = "windows", feature = "ctp_v6_7_11"))]

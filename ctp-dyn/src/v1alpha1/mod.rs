@@ -28,14 +28,4 @@ pub mod traderspi {
 }
 pub use traderspi::*;
 
-pub mod event {
-    include!(concat!(env!("OUT_DIR"), "/event.rs"));
-}
-pub use event::*;
-
-pub mod stream {
-    include!(concat!(env!("OUT_DIR"), "/stream.rs"));
-}
-pub use stream::*;
-
 include!(concat!(env!("OUT_DIR"), "/mod.rs"));

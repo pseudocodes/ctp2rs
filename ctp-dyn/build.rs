@@ -1,4 +1,4 @@
-#![allow(unused_variables, unused_macros, unreachable_code)]
+#![allow(unreachable_code)]
 use std::env;
 use std::env::var;
 
@@ -21,9 +21,8 @@ fn get_sdk_path() -> &'static std::path::Path {
     let version_features: &[(&str, bool)] = &[
         ("ctp_v6_7_2", cfg!(feature = "ctp_v6_7_2")),
         ("ctp_v6_7_7", cfg!(feature = "ctp_v6_7_7")),
-        ("ctp_v6_7_8", cfg!(feature = "ctp_v6_7_8")),
-        ("ctp_v6_7_9", cfg!(feature = "ctp_v6_7_9")),
         ("ctp_v6_7_11", cfg!(feature = "ctp_v6_7_11")),
+        ("ctp_v6_7_13", cfg!(feature = "ctp_v6_7_13")),
         ("mini_v1_6_9", cfg!(feature = "mini_v1_6_9")),
         ("mini_v1_7_0", cfg!(feature = "mini_v1_7_0")),
         ("sopt_v3_7_3", cfg!(feature = "sopt_v3_7_3")),
@@ -72,62 +71,10 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    if cfg!(feature = "ctp_v6_7_7") {
-        if cfg!(feature = "openctp") {
-            panic!("`openctp` feature not supported for `v6_7_7`.");
-        }
-        if cfg!(target_os = "macos") {
-            return Path::new("./api/ctp/v6.7.7/v6.7.7_MacOS_20240716");
-        }
-        if cfg!(target_os = "linux") {
-            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
-        }
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_traderapi64_se_windows/");
-        }
-    }
-
-    if cfg!(feature = "ctp_v6_7_8") {
-        if cfg!(feature = "openctp") {
-            panic!("`openctp` feature not supported for `v6_7_8`.");
-        }
-        if cfg!(target_os = "macos") {
-            panic!("`macOS platform` not supported for `v6_7_8`.");
-        }
-        if cfg!(target_os = "linux") {
-            return Path::new("./api/ctp/v6.7.8/v6.7.8_20240918_api_traderapi_se_linux64");
-        }
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/ctp/v6.7.8/20240918_traderapi64_se_windows/");
-        }
-    }
-
-    if cfg!(feature = "ctp_v6_7_9") {
-        if cfg!(feature = "openctp") {
-            panic!("`openctp` feature not supported for `v6_7_9`.");
-        }
-        if cfg!(target_os = "macos") {
-            panic!("`macOS platform` not supported for `v6_7_9`.");
-        }
-        if cfg!(target_os = "linux") {
-            return Path::new("./api/ctp/v6.7.9/v6.7.9_P1_20250319_api_traderapi_se_linux64/");
-        }
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/ctp/v6.7.9/20250319_traderapi64_se_windows/");
-        }
-    }
-
-    if cfg!(feature = "ctp_v6_7_11") {
-        if cfg!(target_os = "macos") {
-            panic!("`macos` feature not supported for `v6_7_11`.");
-        }
-        if cfg!(target_os = "linux") {
-            return Path::new("./api/ctp/v6.7.11/v6.7.11_20250617_api_traderapi_se_linux64/");
-        }
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/ctp/v6.7.11/v6.7.11_20250617_traderapi64_se_windows/");
-        }
-    }
+    // ── CTP 主线版本（按优先级排列，非 default 版本优先）──
+    // 当 workspace feature unification 导致多个版本同时启用时，
+    // 非 default 版本（由 example 显式指定）应优先于 default 版本。
+    // 当前 default = ctp_v6_7_7，因此放在最后匹配。
 
     if cfg!(feature = "ctp_v6_7_2") {
         if cfg!(target_os = "windows") {
@@ -144,7 +91,47 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    panic!("Either 'ctp_v6_7_2' or 'ctp_v6_7_7' feature must be enabled.");
+    
+    if cfg!(feature = "ctp_v6_7_11") {
+        if cfg!(target_os = "macos") {
+            panic!("`macos` feature not supported for `v6_7_11`.");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.11/v6.7.11_20250617_api_traderapi_se_linux64/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.11/v6.7.11_20250617_traderapi64_se_windows/");
+        }
+    }
+
+    if cfg!(feature = "ctp_v6_7_13") {
+        if cfg!(target_os = "macos") {
+            panic!("`macos` feature not supported for `v6_7_13`.");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.13/v6.7.13_20260225_api_traderapi_se_linux64");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.13/v6.7.13_20260225_winApi");
+        }
+    }
+
+    // default 版本放最后，仅在没有其他版本匹配时生效
+    // 当没有任何版本 feature 启用时，也 fallback 到此版本
+    if cfg!(target_os = "macos") {
+        if cfg!(feature = "openctp") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+        }
+        return Path::new("./api/ctp/v6.7.7/v6.7.7_MacOS_20240716");
+    }
+    if cfg!(target_os = "linux") {
+        return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+    }
+    if cfg!(target_os = "windows") {
+        return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_traderapi64_se_windows/");
+    }
+
+    panic!("Unsupported target platform.");
 }
 
 fn ensure_dir_exists(path: &PathBuf) -> io::Result<()> {
@@ -205,11 +192,10 @@ fn build_dyn() {
         )
         .unwrap();
     }
-    generate_mduser_wrapper_code(&tu.get_entity(), &out_path);
-    generate_trader_wrapper_code(&tu.get_entity(), &out_path);
-    generate_stream_wrapper_code(&tu.get_entity(), &out_path);
+    generate_mduser_wrapper_code(&tu.get_entity(), &out_path, &CodegenConfig::default());
+    generate_trader_wrapper_code(&tu.get_entity(), &out_path, &CodegenConfig::default());
 
-    if let Err(err) = generate_errors_wrapper_code(sdk_path.join("error.xml"), &out_path) {
+    if let Err(_err) = generate_errors_wrapper_code(sdk_path.join("error.xml"), &out_path) {
         // panic!("Failed to generate errors wrapper code: {}", err);
     }
 

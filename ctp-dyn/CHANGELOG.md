@@ -1,5 +1,54 @@
 # Changelog
 
+## [Unreleased] - 2026-05-02
+
+### Added
+- 添加 CTP v6.7.13 SDK 头文件和预编译库（Linux / Windows）
+- `Cargo.toml` 新增 `ctp_v6_7_13` feature（启用 `dynlib` + `union`）
+- `build.rs` 新增 `ctp_v6_7_13` 分支及互斥检查条目
+- `openctp` 示例适配 v6.7.13 的 `subscribe_private_topic` 新增参数（`#[cfg]` 条件编译）
+
+### Changed
+- 默认 feature 调整为 `ctp_v6_7_7`（原先无指定版本，依赖 fallback）
+- 更新 README 版本支持表格，反映当前可用版本
+- 版本号升级至 **0.1.10-alpha3**
+
+### Removed
+- 移除 `ctp_v6_7_8`、`ctp_v6_7_9` feature 及对应 `build.rs` 分支（SDK 不再随仓库分发）
+- `openctp` 示例移除 `ctp_v6_7_8` / `ctp_v6_7_9` feature 选项
+
+
+## [Unreleased] - 2026-03-10
+
+### Changed
+- default feature 不再包含版本选择（移除 `ctp_v6_7_7`），`build.rs` 在无版本 feature 时自动 fallback 到 v6.7.7
+- `build.rs` 版本匹配优先级调整：显式指定的版本优先匹配，fallback 版本（v6.7.7）降至最后，缓解 Cargo workspace feature unification 导致的签名冲突
+- `ctp_v6_7_8` / `ctp_v6_7_9` 新增 openctp 支持，macOS 下使用对应版本的 Linux 头文件编译
+- macOS fallback 路径新增 openctp 判断，启用时使用 Linux 头文件
+- `localctp` 示例锁定 `ctp_v6_7_2` 版本
+- `openctp` 示例新增 `ctp_v6_7_8` / `ctp_v6_7_9` feature 选项
+
+
+## [Unreleased] - 2026-03-04
+
+### Changed
+- **codegen 架构重构**：从 handler 注册表 + 多 Pass 遍历架构重构为 IR 管线（AST → MethodInfo → Rust code），codegen 源码从约 1920 行精简至约 1080 行（减少约 44%）
+- **codegen 模块重组**：删除 `setting.rs`（Config/Context/Handler）和原 `parser.rs`（1029 行单体文件），拆分为职责清晰的三个模块：
+  - `parser.rs` — IR 数据结构定义 + C++ AST 提取
+  - `generator.rs` — IR → Rust 代码生成
+  - `naming.rs` — XML 错误 ID → Rust 枚举名转换
+- **移除 event/stream 代码生成**：构建期不再生成 `event.rs` 和 `stream.rs`（`MdSpiEvent`/`TraderSpiEvent` 枚举及 `futures::Stream` 异步流封装）；用户可在应用层通过 `std::sync::mpsc` 自行实现等效功能（参见 `examples/channel`）
+- **示例适配**：`examples/channel` 改用本地 `MdEvent` 枚举 + `std::sync::mpsc::sync_channel`；`examples/localctp` 改用本地 `ChannelTraderSpi` + `TraderEvent` 枚举，通过 `mpsc::unbounded_channel` 桥接 tokio
+- **生成代码展示方式变更**：`generated/` 目录下的 `.rs` 文件替换为 `README.md`，以代码块引用方式展示各生成文件节选，重点标注跨平台签名差异（如 macOS `ReqUserLogin` 额外的 `length`/`systemInfo` 参数），避免误导 AI agent 或开发者将展示文件当作编译源码
+
+### Removed
+- `codegen/setting.rs`、`codegen/stream.rs`
+- `futures`、`parking_lot` 运行时依赖
+- `examples/localctp` 的 `futures` 依赖
+- `errors.rs` 中未使用的编码检测函数（`read_file_with_encoding_detection`、`extract_encoding_from_xml_declaration`、`detect_encoding`）
+- `generated/` 目录下的 `.rs` 展示文件
+
+
 ## [Unreleased] - 2026-02-11
 
 ### Fixed
