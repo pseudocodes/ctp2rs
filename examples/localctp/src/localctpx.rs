@@ -339,9 +339,11 @@ pub async fn query(ctp_account: &CtpAccountConfig) {
     localctp
         .tdapi
         .subscribe_public_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);
+
     localctp
         .tdapi
         .subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);
+
     debug!("subscribe topic done");
     localctp.tdapi.init();
     debug!("init done");

@@ -1,5 +1,23 @@
 # Changelog
 
+## [Unreleased] - 2026-05-02
+
+### Added
+- 添加 CTP v6.7.13 SDK 头文件和预编译库（Linux / Windows）
+- `Cargo.toml` 新增 `ctp_v6_7_13` feature（启用 `dynlib` + `union`）
+- `build.rs` 新增 `ctp_v6_7_13` 分支及互斥检查条目
+- `openctp` 示例适配 v6.7.13 的 `subscribe_private_topic` 新增参数（`#[cfg]` 条件编译）
+
+### Changed
+- 默认 feature 调整为 `ctp_v6_7_7`（原先无指定版本，依赖 fallback）
+- 更新 README 版本支持表格，反映当前可用版本
+- 版本号升级至 **0.1.10-alpha3**
+
+### Removed
+- 移除 `ctp_v6_7_8`、`ctp_v6_7_9` feature 及对应 `build.rs` 分支（SDK 不再随仓库分发）
+- `openctp` 示例移除 `ctp_v6_7_8` / `ctp_v6_7_9` feature 选项
+
+
 ## [Unreleased] - 2026-03-10
 
 ### Changed
@@ -8,7 +26,7 @@
 - `ctp_v6_7_8` / `ctp_v6_7_9` 新增 openctp 支持，macOS 下使用对应版本的 Linux 头文件编译
 - macOS fallback 路径新增 openctp 判断，启用时使用 Linux 头文件
 - `localctp` 示例锁定 `ctp_v6_7_2` 版本
-- `openctp` 示例新增 `ctp_v6_7_8` / `ctp_v6_7_9` feature 选项 
+- `openctp` 示例新增 `ctp_v6_7_8` / `ctp_v6_7_9` feature 选项
 
 
 ## [Unreleased] - 2026-03-04

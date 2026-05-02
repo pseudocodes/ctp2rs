@@ -33,17 +33,16 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 
 * **切换 CTP API 版本**
 
-已加入项目的 CTP 柜台版本
-| version         | feature      | Linux | macOS | Windows |
-| :-------------- | ------------ | ----- | ----- | ------- |
-| ctp v6.7.2      | ctp_v6_7_2   | x     | x     |   x     |
-| ctp v6.7.7      | ctp_v6_7_7   | x     | x     |   x     |
-| ctp v6.7.8      | ctp_v6_7_8   | x     |       |   x     |
-| ctp v6.7.9      | ctp_v6_7_9   | x     |       |   x     |
-| ctp v6.7.11     | ctp_v6_7_11  | x     |       |   x     |
-| ctp-mini v1.6.9 | mini_v1_6_9  | x     |       |   x     |
-| ctp-mini v1.7.0 | mini_v1_7_0  | x     |       |   x     |
-| ctp-sopt v3.7.3 | sopt_v3_7_3  | x     |       |   x     |
+本项目仓库附带的 CTP 柜台版本
+| version         | feature     | Linux | macOS | Windows |
+| :-------------- | ----------- | ----- | ----- | ------- |
+| ctp v6.7.2      | ctp_v6_7_2  | x     | x     | x       |
+| ctp v6.7.7      | ctp_v6_7_7  | x     | x     | x       |
+| ctp v6.7.11     | ctp_v6_7_11 | x     |       | x       |
+| ctp v6.7.13     | ctp_v6_7_13 | x     |       | x       |
+| ctp-mini v1.6.9 | mini_v1_6_9 | x     |       | x       |
+| ctp-mini v1.7.0 | mini_v1_7_0 | x     |       | x       |
+| ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       | x       |
 
 
 实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段，或开发者可以采用环境变量来指定具体绑定的 CTP API 版本
@@ -58,7 +57,7 @@ ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] }
 或者
 ```toml
 [dependencies]
-ctp2rs = { version = "0.1.10-alpha2", features = ["ctp_v6_7_11"] } 
+ctp2rs = { version = "0.1.10-alpha3", features = ["ctp_v6_7_11"] } 
 ```
 
 
@@ -71,7 +70,8 @@ ctp2rs = { version = "0.1.10-alpha2", features = ["ctp_v6_7_11"] }
   * 指定的依赖目录里的头文件或者 `error.xml` 需要转码至 `UTF8`
   
 ```shell
-> CTP_API_INCLUDE_DIR=/absolute/path/to/your/ctp/api/ cargo build 
+> CTP_API_INCLUDE_DIR=/absolute/path/to/your/ctp/api/ \
+cargo build --no-default-features --features "v1alpha1,dynlib,union"
 ```
 
 * **基本样例**
@@ -111,22 +111,22 @@ cargo run --example <example>
 
 
 ## Related Projects
-|| **项目名称**| **链接**| **crate**| **支持平台** |**关系/特点**           |
-|---| :--------------: | :-----|:------------------: | :------------:|------------------- |
-|1| WiSaGaN/ctp-rs | [github.com/WiSaGaN/ctp-rs](https://github.com/WiSaGaN/ctp-rs) | N/A | Win64/Linux | 采用 vtable 映射实现 C++ 类的方法调用, 已归档不在 github 更新 |
-|2| SheldonNico/ctp-rs | [github.com/SheldonNico/ctp-rs](https://github.com/SheldonNico/ctp-rs)| N/A | Win64/Linux | 采用 C++ wrapper 代码作为桥接辅助封装; 20250630 后参考 `ctp2rs` 构建方式，支持了环境变量头文件编译，由 rust 重写 python 构建代码|
-|3| rust-share | [github.com/mineralres/rust-share](https://github.com/mineralres/rust-share) | N/A| Win64/Linux | 首个提供了构建时解析 CTP 头文件并生成 Rust 封装代码的功能的项目，同时提供了异步 Stream 调用接口功能 |
-|4| gqf2008/ctp-rs| [github.com/gqf2008/ctp-rs](https://github.com/gqf2008/ctp-rs) |N/A | Win64/Linux| 类似`2`, 采用 C++ 代码辅助封装 |
-|5| libctp-sys| [github.com/unknown-marketwizards/libctp-sys](https://github.com/unknown-marketwizards/libctp-sys)| [libctp-sys](https://crates.io/crates/libctp-sys)| Win64/Linux | 类似`2`, 采用 C++ 代码辅助封装 |
-|6| kozyn/ctp-rust| [github.com/kozyan/ctp-rust](https://github.com/kozyan/ctp-rust)| N/A |Win64/Linux   | `2` 的分支项目 |
-|7| ctp-alone | [github.com/calebx/ctp-alone](https://github.com/calebx/ctp-alone)| N/A |Win64/Linux | `1` 的分支项目 |
-|8| ctp-sys | [https://github.com/daedalus2022/ctp-sys](https://github.com/daedalus2022/ctp-sys) |[ctp-sys](https://crates.io/crates/ctp-sys)| Win64/Linux| rust-share 的分支实现 |
-|9| ctp-futures|[github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)|[ctp-futures](https://crates.io/crates/ctp-futures)| Win64/Linux |rust-share 的分支实现 |
-|10| localctp-sys| [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)|[localctp-sys](https://crates.io/crates/localctp-sys)| Win64/Linux| rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本|
-|11| RTP| [github.com/glacierx/RTP](https://github.com/glacierx/RTP)|[rptx](https://crates.io/crates/rtpx)| Linux| `1` 分支实现, 仅实现了 TraderApi 绑定|
-|12| rn7s2/ctp-rs| [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)|[ctp-rs](https://crates.io/crates/ctp-rs)| Win64/Linux| 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本|
-|13| myctp-rs  | [https://github.com/shawn666liu/myctp-rs](https://github.com/shawn666liu/myctp-rs)| N/A | Win64/Linux| 基于作者的纯 C 封装项目 [ftdc2c_ctp](https://github.com/shawn666liu/ftdc2c_ctp) 之上的 Rust 封装，项目尝试提供多种高度抽象的封装范式，编译构建较为繁琐，建议采用大模型解读|
-|14| deepissue/ctp-rust| [https://github.com/deepissue/ctp-rust](https://github.com/deepissue/ctp-rust) | [ctp-rust](https://crates.io/crates/ctp-rust)|Linux/MacOS | [2025-09-25]项目封装方案估计由大模型提供，未清晰理解 CTP 具体环境和业务状态，仅从 rust 语言层面提供了技术封装方案，接口 api 函数未全部实现封装，代码存有 TODO, MacOS 接口封装无法通过穿透式认证|
+|     |    **项目名称**    | **链接**                                                                                           |                       **crate**                       | **支持平台** | **关系/特点**                                                                                                                                                                                   |
+| --- | :----------------: | :------------------------------------------------------------------------------------------------- | :---------------------------------------------------: | :----------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   |   WiSaGaN/ctp-rs   | [github.com/WiSaGaN/ctp-rs](https://github.com/WiSaGaN/ctp-rs)                                     |                          N/A                          | Win64/Linux  | 采用 vtable 映射实现 C++ 类的方法调用, 已归档不在 github 更新                                                                                                                                   |
+| 2   | SheldonNico/ctp-rs | [github.com/SheldonNico/ctp-rs](https://github.com/SheldonNico/ctp-rs)                             |                          N/A                          | Win64/Linux  | 采用 C++ wrapper 代码作为桥接辅助封装; 20250630 后参考 `ctp2rs` 构建方式，支持了环境变量头文件编译，由 rust 重写 python 构建代码                                                                |
+| 3   |     rust-share     | [github.com/mineralres/rust-share](https://github.com/mineralres/rust-share)                       |                          N/A                          | Win64/Linux  | 首个提供了构建时解析 CTP 头文件并生成 Rust 封装代码的功能的项目，同时提供了异步 Stream 调用接口功能                                                                                             |
+| 4   |   gqf2008/ctp-rs   | [github.com/gqf2008/ctp-rs](https://github.com/gqf2008/ctp-rs)                                     |                          N/A                          | Win64/Linux  | 类似`2`, 采用 C++ 代码辅助封装                                                                                                                                                                  |
+| 5   |     libctp-sys     | [github.com/unknown-marketwizards/libctp-sys](https://github.com/unknown-marketwizards/libctp-sys) |   [libctp-sys](https://crates.io/crates/libctp-sys)   | Win64/Linux  | 类似`2`, 采用 C++ 代码辅助封装                                                                                                                                                                  |
+| 6   |   kozyn/ctp-rust   | [github.com/kozyan/ctp-rust](https://github.com/kozyan/ctp-rust)                                   |                          N/A                          | Win64/Linux  | `2` 的分支项目                                                                                                                                                                                  |
+| 7   |     ctp-alone      | [github.com/calebx/ctp-alone](https://github.com/calebx/ctp-alone)                                 |                          N/A                          | Win64/Linux  | `1` 的分支项目                                                                                                                                                                                  |
+| 8   |      ctp-sys       | [https://github.com/daedalus2022/ctp-sys](https://github.com/daedalus2022/ctp-sys)                 |      [ctp-sys](https://crates.io/crates/ctp-sys)      | Win64/Linux  | rust-share 的分支实现                                                                                                                                                                           |
+| 9   |    ctp-futures     | [github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)                     |  [ctp-futures](https://crates.io/crates/ctp-futures)  | Win64/Linux  | rust-share 的分支实现                                                                                                                                                                           |
+| 10  |    localctp-sys    | [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)           | [localctp-sys](https://crates.io/crates/localctp-sys) | Win64/Linux  | rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本                                                                                                    |
+| 11  |        RTP         | [github.com/glacierx/RTP](https://github.com/glacierx/RTP)                                         |         [rptx](https://crates.io/crates/rtpx)         |    Linux     | `1` 分支实现, 仅实现了 TraderApi 绑定                                                                                                                                                           |
+| 12  |    rn7s2/ctp-rs    | [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)                                 |       [ctp-rs](https://crates.io/crates/ctp-rs)       | Win64/Linux  | 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本                                                           |
+| 13  |      myctp-rs      | [https://github.com/shawn666liu/myctp-rs](https://github.com/shawn666liu/myctp-rs)                 |                          N/A                          | Win64/Linux  | 基于作者的纯 C 封装项目 [ftdc2c_ctp](https://github.com/shawn666liu/ftdc2c_ctp) 之上的 Rust 封装，项目尝试提供多种高度抽象的封装范式，编译构建较为繁琐，建议采用大模型解读                      |
+| 14  | deepissue/ctp-rust | [https://github.com/deepissue/ctp-rust](https://github.com/deepissue/ctp-rust)                     |     [ctp-rust](https://crates.io/crates/ctp-rust)     | Linux/MacOS  | [2025-09-25]项目封装方案估计由大模型提供，未清晰理解 CTP 具体环境和业务状态，仅从 rust 语言层面提供了技术封装方案，接口 api 函数未全部实现封装，代码存有 TODO, MacOS 接口封装无法通过穿透式认证 |
 
 
 ### Potential Issues
