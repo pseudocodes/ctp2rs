@@ -7,11 +7,12 @@ edition = "2021"
 libloading = "0.8.6"
 memchr = "2.7.4"
 
-ctp2rs = { path = "../../ctp-dyn/", optional = true }
+ctp2rs = { path = "../../ctp-dyn/", default-features = false }
 
 log = "0.4.22"
 dotenv = "0.15.0"
 env_logger = "0.11.5"
 
 [features]
-default = ["ctp2rs/default"]
+default = ["v1alpha1"]
+v1alpha1 = ["ctp2rs/v1alpha1"]

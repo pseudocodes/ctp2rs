@@ -85,10 +85,10 @@ pub fn run_md(config: CtpAccountConfig) {
         config.md_dynlib_path.to_string_lossy()
     );
 
-    #[cfg(not(feature = "ctp_v6_7_11"))]
+    #[cfg(not(any(feature = "ctp_v6_7_11", feature = "ctp_v6_7_13")))]
     let mdapi = MdApi::create_api(&config.md_dynlib_path, "./md_", false, false);
 
-    #[cfg(feature = "ctp_v6_7_11")]
+    #[cfg(any(feature = "ctp_v6_7_11", feature = "ctp_v6_7_13"))]
     let mdapi = MdApi::create_api(&config.md_dynlib_path, "./md_", false, false, true);
 
     let mdapi = Arc::new(mdapi);

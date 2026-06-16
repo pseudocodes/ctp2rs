@@ -259,16 +259,18 @@ fn classify_param_type(tp: &clang::Type) -> ParamKind {
     match tp.get_kind() {
         TypeKind::Int => ParamKind::Int,
         TypeKind::Bool => ParamKind::Bool,
-        TypeKind::Enum => ParamKind::Enum(tp.get_display_name()),
+        TypeKind::Enum => ParamKind::Enum(rust_type_name(&tp.get_display_name())),
         TypeKind::Elaborated => {
             let canonical = tp.get_canonical_type();
             match canonical.get_kind() {
                 TypeKind::Int => ParamKind::Int,
                 TypeKind::Bool => ParamKind::Bool,
-                TypeKind::Enum => ParamKind::Enum(tp.get_display_name()),
-                TypeKind::ConstantArray => ParamKind::ConstantArray(tp.get_display_name()),
+                TypeKind::Enum => ParamKind::Enum(rust_type_name(&tp.get_display_name())),
+                TypeKind::ConstantArray => {
+                    ParamKind::ConstantArray(rust_type_name(&tp.get_display_name()))
+                }
                 TypeKind::Pointer => classify_pointer_type(&canonical),
-                _ => ParamKind::StructPtr(tp.get_display_name()),
+                _ => ParamKind::StructPtr(rust_type_name(&tp.get_display_name())),
             }
         }
         TypeKind::Pointer => classify_pointer_type(tp),
@@ -281,9 +283,9 @@ fn classify_param_type(tp: &clang::Type) -> ParamKind {
 fn classify_pointer_type(tp: &clang::Type) -> ParamKind {
     let pointee = tp.get_pointee_type().unwrap();
     match pointee.get_kind() {
-        TypeKind::CharS => ParamKind::CharPtr,
+        TypeKind::CharS | TypeKind::CharU | TypeKind::SChar | TypeKind::UChar => ParamKind::CharPtr,
         TypeKind::Pointer | TypeKind::Elaborated | TypeKind::Record => {
-            ParamKind::StructPtr(pointee.get_display_name())
+            ParamKind::StructPtr(rust_type_name(&pointee.get_display_name()))
         }
         other => panic!(
             "未处理的指针目标类型: {:?} ({})",
@@ -291,6 +293,15 @@ fn classify_pointer_type(tp: &clang::Type) -> ParamKind {
             pointee.get_display_name()
         ),
     }
+}
+
+/// 将 libclang display name 转为 bindgen 当前输出的 Rust 类型名。
+fn rust_type_name(display_name: &str) -> String {
+    display_name
+        .rsplit("::")
+        .next()
+        .unwrap_or(display_name)
+        .to_string()
 }
 
 /// 分类返回类型

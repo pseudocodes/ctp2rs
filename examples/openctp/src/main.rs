@@ -61,15 +61,21 @@ fn create_config_for_environment(
             // 仿真环境配置
             #[cfg(target_os = "macos")]
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_MacOS_20231016/thostmduserapi_se.framework/thostmduserapi_se");
-            #[cfg(all(target_os = "linux", not(feature = "ctp_v6_7_11")))]
+            #[cfg(all(target_os = "linux", not(any(feature = "ctp_v6_7_11", feature = "ctp_v6_7_13"))))]
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_linux64/thostmduserapi_se.so");
             #[cfg(all(target_os = "linux", feature = "ctp_v6_7_11"))]
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.11/v6.7.11_20250617_api_traderapi_se_linux64/thostmduserapi_se.so");
-            
-            #[cfg(all(target_os = "windows", not(feature = "ctp_v6_7_11")))]
+            #[cfg(all(target_os = "linux", feature = "ctp_v6_7_13"))]
+            let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.13/v6.7.13_20260225_api_traderapi_se_linux64/thostmduserapi_se.so");
+
+            #[cfg(all(target_os = "windows", not(any(feature = "ctp_v6_7_11", feature = "ctp_v6_7_13"))))]
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.2/v6.7.2_20230913_api_traderapi_se_win64/thostmduserapi_se.dll");
             #[cfg(all(target_os = "windows", feature = "ctp_v6_7_11"))]
             let md_dynlib_path = base_path.join("../../../ctp-dyn/api/ctp/v6.7.11/v6.7.11_20250617_traderapi64_se_windows/thostmduserapi_se.dll");
+            #[cfg(all(target_os = "windows", feature = "ctp_v6_7_13"))]
+            let md_dynlib_path = base_path.join(
+                "../../../ctp-dyn/api/ctp/v6.7.13/v6.7.13_20260225_winApi/thostmduserapi_se.dll",
+            );
 
             #[cfg(target_os = "macos")]
             let td_dynlib_path = base_path.join("tts/v6_7_2/mac_arm64/thosttraderapi_se.dylib");

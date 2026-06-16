@@ -12,7 +12,7 @@ name = "sim"
 path = "src/bin/sim.rs"
 
 [dependencies]
-ctp2rs = { path = "../../ctp-dyn", optional = true }
+ctp2rs = { path = "../../ctp-dyn", default-features = false }
 
 log = "0.4.22"
 dotenv = "0.15.0"
@@ -24,4 +24,5 @@ chrono = "0.4"
 
 tokio = { version = "1.43.1", features = ["full"] }
 [features]
-default = ["ctp2rs/ctp_v6_7_2", "ctp2rs/openctp"]
+default = ["ctp_v6_7_2"]
+ctp_v6_7_2 = ["ctp2rs/v1alpha1", "ctp2rs/openctp", "ctp2rs/ctp_v6_7_2"]

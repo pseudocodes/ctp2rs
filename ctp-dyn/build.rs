@@ -1,4 +1,10 @@
 #![allow(unreachable_code)]
+#[cfg(all(feature = "v1alpha1", feature = "v1alpha2"))]
+compile_error!("features `v1alpha1` and `v1alpha2` cannot be enabled at the same time");
+
+#[cfg(not(any(feature = "v1alpha1", feature = "v1alpha2")))]
+compile_error!("one API layer feature must be enabled: `v1alpha1` or `v1alpha2`");
+
 use std::env;
 use std::env::var;
 
@@ -23,9 +29,10 @@ fn get_sdk_path() -> &'static std::path::Path {
         ("ctp_v6_7_7", cfg!(feature = "ctp_v6_7_7")),
         ("ctp_v6_7_11", cfg!(feature = "ctp_v6_7_11")),
         ("ctp_v6_7_13", cfg!(feature = "ctp_v6_7_13")),
-        ("mini_v1_6_9", cfg!(feature = "mini_v1_6_9")),
         ("mini_v1_7_0", cfg!(feature = "mini_v1_7_0")),
+        ("mini_v1_7_5", cfg!(feature = "mini_v1_7_5")),
         ("sopt_v3_7_3", cfg!(feature = "sopt_v3_7_3")),
+        ("sopt_v3_7_5", cfg!(feature = "sopt_v3_7_5")),
     ];
     let enabled: Vec<&str> = version_features
         .iter()
@@ -43,31 +50,39 @@ fn get_sdk_path() -> &'static std::path::Path {
     }
 
     // 基于版本的分支判断
-
-    if cfg!(feature = "mini_v1_6_9") {
-        if cfg!(target_os = "linux") {
-            return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_linux64_api_20240527/");
-        }
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_win_api_20240527/win64/");
-        }
-    }
-
     if cfg!(feature = "mini_v1_7_0") {
         if cfg!(target_os = "linux") {
-            return Path::new("./api/mini/v1.7.0/CTPMini_V1.7.0_linux64_api_20240923/");
+            return Path::new("./api/mini/v1.7.0/CTPIIMini_V1.7.0_linux64_api_20240923/");
         }
         if cfg!(target_os = "windows") {
             return Path::new("./api/mini/v1.7.0/CTPIIMini_V1.7.0_win_api_20240923/win64/");
         }
     }
 
+    if cfg!(feature = "mini_v1_7_5") {
+        if cfg!(target_os = "linux") || cfg!(target_os = "macos") {
+            return Path::new("./api/mini/v1.7.5/CTPMini_V1.7.5_linux64_api_20260115/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/mini/v1.7.5/CTPMini_V1.7.5_win_api_20260115/win64/");
+        }
+    }
+
     if cfg!(feature = "sopt_v3_7_3") {
-        if cfg!(target_os = "linux") {
+        if cfg!(target_os = "linux") || cfg!(target_os = "macos") {
             return Path::new("./api/ctpsopt/v3.7.3/v3.7.3_20240910_api_traderapi_linux64_se/");
         }
         if cfg!(target_os = "windows") {
             return Path::new("./api/ctpsopt/v3.7.3/20240910_traderapi64_windows_se/");
+        }
+    }
+
+    if cfg!(feature = "sopt_v3_7_5") {
+        if cfg!(target_os = "linux") || cfg!(target_os = "macos") {
+            return Path::new("./api/ctpsopt/v3.7.5/v3.7.5_20251125_api_traderapi_linux64_se/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctpsopt/v3.7.5/20251125_traderapi64_windows_se/");
         }
     }
 
@@ -91,7 +106,6 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    
     if cfg!(feature = "ctp_v6_7_11") {
         if cfg!(target_os = "macos") {
             panic!("`macos` feature not supported for `v6_7_11`.");

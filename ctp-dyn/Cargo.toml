@@ -1,6 +1,6 @@
 [package]
 name = "ctp2rs"
-version = "0.1.10-alpha3"
+version = "0.1.10-alpha4"
 edition = "2021"
 authors = ["Pseudo <pseudocodes@gmail.com>"]
 description = "Shanghai Futures CTP/CTP-Mini/CTP-Sopt Rust native binding, supporting production, evaluation, stock-option, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"
@@ -38,18 +38,21 @@ memchr = "2.7.4"
 encoding_rs = "0.8.35"
 
 [features]
-default = ["v1alpha1", "dynlib", "ctp_v6_7_7"]
+default = ["v1alpha1"]
+v1alpha1 = []
+v1alpha2 = []
+
 dynlib = []
 sopt = []
 mini = []
 union = []
 openctp = []
+
 ctp_v6_7_2 = ["dynlib"]
 ctp_v6_7_7 = ["dynlib"]
 ctp_v6_7_11 = ["dynlib", "union"]
 ctp_v6_7_13 = ["dynlib", "union"]
-mini_v1_6_9 = ["dynlib", 'mini']
-mini_v1_7_0 = ["dynlib", 'mini']
+mini_v1_7_0 = ["dynlib", "mini"]
+mini_v1_7_5 = ["dynlib", "mini"]
 sopt_v3_7_3 = ["dynlib", "sopt"]
-v1alpha1 = []
-v1alpha2 = []
+sopt_v3_7_5 = ["dynlib", "sopt"]
