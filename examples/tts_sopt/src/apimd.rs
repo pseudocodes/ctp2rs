@@ -82,13 +82,13 @@ pub fn run_md() {
     let base_dir = var("CARGO_MANIFEST_DIR").unwrap();
     println!("base_dir: {base_dir}");
     #[cfg(target_os = "macos")]
-    let dynlib_path = "./tts/v6_7_2/mac_arm64/thostmduserapi_se.dylib";
+    let dynlib_path = "./tts/v3.7.3/mac64/soptthostmduserapi_se.dylib";
 
     #[cfg(target_os = "linux")]
-    let dynlib_path = "./tts/v3.7.0/lin64/soptthostmduserapi_se.so";
+    let dynlib_path = "./tts/v3.7.3/lin64/soptthostmduserapi_se.so";
 
     #[cfg(target_os = "windows")]
-    let dynlib_path = "./tts/v3.7.0/win64/soptthostmduserapi_se.dll";
+    let dynlib_path = "./tts/v3.7.3/win64/soptthostmduserapi_se.dll";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
     println!(
@@ -106,7 +106,7 @@ pub fn run_md() {
     let mdspi_box = Box::new(base_mdspi);
     println!("md get_api_version: {}", mdapi.get_api_version());
 
-    mdapi.register_front("tcp://121.37.80.177:20004"); // tts 7x24 md
+    mdapi.register_front("tcp://trading.openctp.cn:30011"); // tts 7x24 md
 
     let mdspi_ptr = Box::into_raw(mdspi_box) as *mut dyn MdSpi;
     let mdspi_ptr2 = mdspi_ptr.clone();

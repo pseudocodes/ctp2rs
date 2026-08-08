@@ -134,11 +134,11 @@ pub fn run_td() {
     println!("base_dir: {base_dir}");
 
     #[cfg(target_os = "macos")]
-    let dynlib_path = "./tts/v6_7_2/mac_arm64/thosttraderapi_se.dylib";
+    let dynlib_path = "./tts/v3.7.3/mac64/soptthosttraderapi_se.dylib";
     #[cfg(target_os = "linux")]
-    let dynlib_path = "./tts/v3.7.0/lin64/soptthosttraderapi_se.so";
+    let dynlib_path = "./tts/v3.7.3/lin64/soptthosttraderapi_se.so";
     #[cfg(target_os = "windows")]
-    let dynlib_path = "./tts/v3.7.0/win64/soptthosttraderapi_se.dll";
+    let dynlib_path = "./tts/v3.7.3/win64/soptthosttraderapi_se.dll";
 
     let dynlib_path = Path::new(&base_dir).join(dynlib_path);
     println!(
@@ -157,7 +157,7 @@ pub fn run_td() {
     let tdspi_ptr2 = tdspi_ptr.clone();
     println!("td get_api_version: {}", tdapi.get_api_version());
 
-    tdapi.register_front("tcp://121.37.80.177:20004"); // tts 7x24 td
+    tdapi.register_front("tcp://trading.openctp.cn:30001"); // tts 7x24 td
 
     tdapi.register_spi(tdspi_ptr);
     tdapi.subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);

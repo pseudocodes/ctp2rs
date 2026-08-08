@@ -1,5 +1,38 @@
 # Changelog
 
+## [Unreleased] - 2026-08-08
+
+### Added
+- 添加 CTP v6.7.13 macOS SDK（`v6.7.13_MacOS_20260729`，含 framework 预编译库），`build.rs` 移除 `ctp_v6_7_13` 的 macOS panic 并新增对应路径分支
+
+### Changed
+- 默认 feature 调整为 `["v1alpha1", "ctp_v6_7_13"]`，默认 CTP 版本抬高到 v6.7.13
+- `build.rs` 版本匹配优先级调整：`ctp_v6_7_7` 改为显式版本分支，default 版本 `ctp_v6_7_13` 降至显式版本之后匹配；无任何版本 feature 时仍 fallback 到 v6.7.7（非 union 签名兼容）
+- 修复 roxmltree `ParsingOptions` 新增字段导致的 codegen 编译错误（补充 `..Default::default()`）
+- 更新 README 版本支持表格及默认 feature 说明
+
+
+## [Unreleased] - 2026-06-17
+
+### Added
+- 添加 CTP-Mini v1.7.5 SDK 头文件和预编译库（Linux / Windows），新增 `mini_v1_7_5` feature 及对应 `build.rs` SDK 路径分支
+- 添加 CTP-Sopt v3.7.5 SDK 头文件和预编译库（Linux / Windows），新增 `sopt_v3_7_5` feature 及对应 `build.rs` SDK 路径分支
+- 新增 codegen 分析、重构计划和静态代码生成设计文档
+
+### Changed
+- 默认 feature 调整为仅启用 `v1alpha1`，SDK 版本 feature 由用户或示例显式选择；未选择版本时仍由 `build.rs` fallback 到 v6.7.7
+- `build.rs` 新增 API 层 feature 校验，要求 `v1alpha1` / `v1alpha2` 二选一，避免关闭默认 feature 后生成目录版本缺失
+- `examples/*` 统一关闭 `ctp2rs` 默认 feature，并显式转发 `ctp2rs/v1alpha1` 与目标 SDK 版本 feature
+- `openctp` 示例补齐 `ctp_v6_7_13` feature、动态库路径和 `create_api` 新签名分支
+- `tts_sopt` 示例动态库路径切换到 v3.7.3 目录，并更新 OpenCTP 前置地址
+- codegen 指针参数分类兼容 `CharU` / `SChar` / `UChar`，避免部分平台头文件中的字符指针被误判为结构体指针
+- 更新 README 版本支持表格和 feature 使用说明，反映当前可用版本及显式版本选择方式
+- 版本号升级至 **0.1.10-alpha4**
+
+### Removed
+- 移除 CTP-Mini v1.6.9 feature 与 SDK 资产，改由 v1.7.5 接替
+
+
 ## [Unreleased] - 2026-05-02
 
 ### Added

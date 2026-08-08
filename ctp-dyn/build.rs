@@ -1,4 +1,10 @@
 #![allow(unreachable_code)]
+#[cfg(all(feature = "v1alpha1", feature = "v1alpha2"))]
+compile_error!("features `v1alpha1` and `v1alpha2` cannot be enabled at the same time");
+
+#[cfg(not(any(feature = "v1alpha1", feature = "v1alpha2")))]
+compile_error!("one API layer feature must be enabled: `v1alpha1` or `v1alpha2`");
+
 use std::env;
 use std::env::var;
 
@@ -23,9 +29,10 @@ fn get_sdk_path() -> &'static std::path::Path {
         ("ctp_v6_7_7", cfg!(feature = "ctp_v6_7_7")),
         ("ctp_v6_7_11", cfg!(feature = "ctp_v6_7_11")),
         ("ctp_v6_7_13", cfg!(feature = "ctp_v6_7_13")),
-        ("mini_v1_6_9", cfg!(feature = "mini_v1_6_9")),
         ("mini_v1_7_0", cfg!(feature = "mini_v1_7_0")),
+        ("mini_v1_7_5", cfg!(feature = "mini_v1_7_5")),
         ("sopt_v3_7_3", cfg!(feature = "sopt_v3_7_3")),
+        ("sopt_v3_7_5", cfg!(feature = "sopt_v3_7_5")),
     ];
     let enabled: Vec<&str> = version_features
         .iter()
@@ -43,27 +50,26 @@ fn get_sdk_path() -> &'static std::path::Path {
     }
 
     // 基于版本的分支判断
-
-    if cfg!(feature = "mini_v1_6_9") {
-        if cfg!(target_os = "linux") {
-            return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_linux64_api_20240527/");
-        }
-        if cfg!(target_os = "windows") {
-            return Path::new("./api/mini/v1.6.9/CTPMini_V1.6.9_win_api_20240527/win64/");
-        }
-    }
-
     if cfg!(feature = "mini_v1_7_0") {
         if cfg!(target_os = "linux") {
-            return Path::new("./api/mini/v1.7.0/CTPMini_V1.7.0_linux64_api_20240923/");
+            return Path::new("./api/mini/v1.7.0/CTPIIMini_V1.7.0_linux64_api_20240923/");
         }
         if cfg!(target_os = "windows") {
             return Path::new("./api/mini/v1.7.0/CTPIIMini_V1.7.0_win_api_20240923/win64/");
         }
     }
 
+    if cfg!(feature = "mini_v1_7_5") {
+        if cfg!(target_os = "linux") || cfg!(target_os = "macos") {
+            return Path::new("./api/mini/v1.7.5/CTPMini_V1.7.5_linux64_api_20260115/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/mini/v1.7.5/CTPMini_V1.7.5_win_api_20260115/win64/");
+        }
+    }
+
     if cfg!(feature = "sopt_v3_7_3") {
-        if cfg!(target_os = "linux") {
+        if cfg!(target_os = "linux") || cfg!(target_os = "macos") {
             return Path::new("./api/ctpsopt/v3.7.3/v3.7.3_20240910_api_traderapi_linux64_se/");
         }
         if cfg!(target_os = "windows") {
@@ -71,10 +77,19 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
+    if cfg!(feature = "sopt_v3_7_5") {
+        if cfg!(target_os = "linux") || cfg!(target_os = "macos") {
+            return Path::new("./api/ctpsopt/v3.7.5/v3.7.5_20251125_api_traderapi_linux64_se/");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctpsopt/v3.7.5/20251125_traderapi64_windows_se/");
+        }
+    }
+
     // ── CTP 主线版本（按优先级排列，非 default 版本优先）──
     // 当 workspace feature unification 导致多个版本同时启用时，
     // 非 default 版本（由 example 显式指定）应优先于 default 版本。
-    // 当前 default = ctp_v6_7_7，因此放在最后匹配。
+    // 当前 default = ctp_v6_7_13，因此放在最后匹配。
 
     if cfg!(feature = "ctp_v6_7_2") {
         if cfg!(target_os = "windows") {
@@ -91,7 +106,21 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    
+    if cfg!(feature = "ctp_v6_7_7") {
+        if cfg!(target_os = "macos") {
+            if cfg!(feature = "openctp") {
+                return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+            }
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_MacOS_20240716");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_traderapi64_se_windows/");
+        }
+    }
+
     if cfg!(feature = "ctp_v6_7_11") {
         if cfg!(target_os = "macos") {
             panic!("`macos` feature not supported for `v6_7_11`.");
@@ -104,9 +133,10 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
+    // default 版本（ctp_v6_7_13）放最后，仅在没有其他显式版本匹配时生效
     if cfg!(feature = "ctp_v6_7_13") {
         if cfg!(target_os = "macos") {
-            panic!("`macos` feature not supported for `v6_7_13`.");
+            return Path::new("./api/ctp/v6.7.13/v6.7.13_MacOS_20260729");
         }
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.13/v6.7.13_20260225_api_traderapi_se_linux64");
@@ -116,8 +146,8 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    // default 版本放最后，仅在没有其他版本匹配时生效
-    // 当没有任何版本 feature 启用时，也 fallback 到此版本
+    // 没有任何版本 feature 启用时（default-features = false 且未选版本），
+    // fallback 到 v6.7.7：其 create 接口为非 union 签名，与 builder.rs 默认符号兼容
     if cfg!(target_os = "macos") {
         if cfg!(feature = "openctp") {
             return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");

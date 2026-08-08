@@ -134,10 +134,10 @@ pub fn run_td(config: CtpAccountConfig) {
         config.td_dynlib_path.to_string_lossy()
     );
 
-    #[cfg(not(feature = "ctp_v6_7_11"))]
+    #[cfg(not(any(feature = "ctp_v6_7_11", feature = "ctp_v6_7_13")))]
     let tdapi = TraderApi::create_api(&config.td_dynlib_path, "./td_");
 
-    #[cfg(feature = "ctp_v6_7_11")]
+    #[cfg(any(feature = "ctp_v6_7_11", feature = "ctp_v6_7_13"))]
     let tdapi = TraderApi::create_api(&config.td_dynlib_path, "./td_", true);
 
     let tdapi = Arc::new(tdapi);
@@ -161,7 +161,7 @@ pub fn run_td(config: CtpAccountConfig) {
     #[cfg(not(feature = "ctp_v6_7_13"))]
     tdapi.subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);
     #[cfg(feature = "ctp_v6_7_13")]
-    tdapi.subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK, 0);
+    tdapi.subscribe_private_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK, 1);
     tdapi.subscribe_public_topic(THOST_TE_RESUME_TYPE::THOST_TERT_QUICK);
 
     tdapi.init();

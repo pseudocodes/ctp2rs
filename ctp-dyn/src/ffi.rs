@@ -291,10 +291,7 @@ pub fn resolve_dynlib_path<P: AsRef<std::path::Path>>(
     #[cfg(target_os = "macos")]
     {
         // macOS: 优先检查 .framework 结构
-        let framework_path = dir.join(format!(
-            "{}.framework/{}",
-            lib_name, lib_name
-        ));
+        let framework_path = dir.join(format!("{}.framework/{}", lib_name, lib_name));
         if framework_path.exists() {
             return framework_path;
         }

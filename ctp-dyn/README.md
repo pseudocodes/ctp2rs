@@ -39,25 +39,26 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 | ctp v6.7.2      | ctp_v6_7_2  | x     | x     | x       |
 | ctp v6.7.7      | ctp_v6_7_7  | x     | x     | x       |
 | ctp v6.7.11     | ctp_v6_7_11 | x     |       | x       |
-| ctp v6.7.13     | ctp_v6_7_13 | x     |       | x       |
-| ctp-mini v1.6.9 | mini_v1_6_9 | x     |       | x       |
+| ctp v6.7.13     | ctp_v6_7_13 | x     | x     | x       |
 | ctp-mini v1.7.0 | mini_v1_7_0 | x     |       | x       |
+| ctp-mini v1.7.5 | mini_v1_7_5 | x     |       | x       |
 | ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       | x       |
+| ctp-sopt v3.7.5 | sopt_v3_7_5 | x     |       | x       |
 
 
 实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段，或开发者可以采用环境变量来指定具体绑定的 CTP API 版本
 `0.1.7` 版本后将不再在项目中跟踪保存 CTP 各版本头文件，除遇各平台主要接口变更
 
-默认采用的 ctp sdk 版本使用 `v6.7.7`，便于各个架构进行测试开发，`v6.7.11` 版本由于合并了生产和评测版本并在主创建实例接口添加了 `bIsProductionMode` 参数，所以需要在开发时用户自行指定;
+默认 feature 启用 `v1alpha1` API 层和 CTP SDK `ctp_v6_7_13`（含 macOS 预编译 framework）。若关闭默认 feature 且未显式选择版本，`build.rs` 会 fallback 到 CTP SDK `v6.7.7`（非 union 签名，兼容旧版 create 接口）；生产项目建议关闭默认 feature 并显式选择目标版本。`v6.7.11` 及之后版本由于合并了生产和评测版本并在主创建实例接口添加了 `bIsProductionMode` 参数，所以需要在开发时用户自行指定。
 
 ```toml
 [dependencies]
-ctp2rs = { version = "0.1", features = ["ctp_v6_7_7"] } 
+ctp2rs = { version = "0.1", default-features = false, features = ["v1alpha1", "ctp_v6_7_7"] }
 ```
 或者
 ```toml
 [dependencies]
-ctp2rs = { version = "0.1.10-alpha3", features = ["ctp_v6_7_11"] } 
+ctp2rs = { version = "0.1.10-alpha3", default-features = false, features = ["v1alpha1", "ctp_v6_7_11"] }
 ```
 
 
@@ -102,6 +103,7 @@ cargo run --example <example>
 - [openctp](../examples/openctp): 连接 openctp 模拟平台的行情以及交易样例，支持 MacOS 以及 Linux 
 - [insecure](../examples/insecure): 可跨版本加载动态方案 POC Demo, 适用 Linux
 - [tts_sopt](../examples/tts_sopt): ctp-sopt 连接 openctp 股票期权仿真环境 demo 
+- [trader](../examples/trader/): 纯交易端示例（不启用行情），channel 事件驱动串联完整链条
   
 ### open-md-gateway
 
@@ -124,7 +126,7 @@ cargo run --example <example>
 | 9   |    ctp-futures     | [github.com/baiguoname/ctp-futures](https://github.com/baiguoname/ctp-futures)                     |  [ctp-futures](https://crates.io/crates/ctp-futures)  | Win64/Linux  | rust-share 的分支实现                                                                                                                                                                           |
 | 10  |    localctp-sys    | [github.com/WhisperCapital/localctp-sys](https://github.com/WhisperCapital/localctp-sys)           | [localctp-sys](https://crates.io/crates/localctp-sys) | Win64/Linux  | rust-share 分支实现，作者重写了封装代码生成模块，扩展性较强，仅适配 LocalCTP, 不支持官方版本                                                                                                    |
 | 11  |        RTP         | [github.com/glacierx/RTP](https://github.com/glacierx/RTP)                                         |         [rptx](https://crates.io/crates/rtpx)         |    Linux     | `1` 分支实现, 仅实现了 TraderApi 绑定                                                                                                                                                           |
-| 12  |    rn7s2/ctp-rs    | [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)                                 |       [ctp-rs](https://crates.io/crates/ctp-rs)       | Win64/Linux  | 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本                                                           |
+| 12  |    rn7s2/ctp-rs    | [https://github.com/rn7s2/ctp-rs](https://github.com/rn7s2/ctp-rs)                                 |       [ctp-rs](https://crates.io/crates/ctp-rs)       | Win64/Linux/MacOS  | 原名 `ctp4rs` 后占据 `ctp-rs` crate, 高度定制化的静态 C++ 代码辅助封装，采用了 `cxx-build` 作为 C++ 代码桥接工具, 仅支持 ctp 最新版本, [2026-05] 之后添加 MacOS/localctp 支持 |
 | 13  |      myctp-rs      | [https://github.com/shawn666liu/myctp-rs](https://github.com/shawn666liu/myctp-rs)                 |                          N/A                          | Win64/Linux  | 基于作者的纯 C 封装项目 [ftdc2c_ctp](https://github.com/shawn666liu/ftdc2c_ctp) 之上的 Rust 封装，项目尝试提供多种高度抽象的封装范式，编译构建较为繁琐，建议采用大模型解读                      |
 | 14  | deepissue/ctp-rust | [https://github.com/deepissue/ctp-rust](https://github.com/deepissue/ctp-rust)                     |     [ctp-rust](https://crates.io/crates/ctp-rust)     | Linux/MacOS  | [2025-09-25]项目封装方案估计由大模型提供，未清晰理解 CTP 具体环境和业务状态，仅从 rust 语言层面提供了技术封装方案，接口 api 函数未全部实现封装，代码存有 TODO, MacOS 接口封装无法通过穿透式认证 |
 
