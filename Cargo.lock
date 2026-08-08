@@ -250,7 +250,7 @@ version = "0.1.0"
 
 [[package]]
 name = "ctp2rs"
-version = "0.1.11-alpha1"
+version = "0.1.11-alpha2"
 dependencies = [
  "Inflector",
  "bindgen",

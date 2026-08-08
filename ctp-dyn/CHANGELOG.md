@@ -3,7 +3,7 @@
 ## [Unreleased] - 2026-08-08
 
 ### Added
-- 添加 CTP v6.7.13 macOS SDK（`v6.7.13_MacOS_20260729`，含 framework 预编译库），`build.rs` 移除 `ctp_v6_7_13` 的 macOS panic 并新增对应路径分支
+- 添加 CTP v6.7.13 macOS SDK（`v6.7.13_MacOS_20260529`，含 framework 预编译库），`build.rs` 移除 `ctp_v6_7_13` 的 macOS panic 并新增对应路径分支
 
 ### Changed
 - 默认 feature 调整为 `["v1alpha1", "ctp_v6_7_13"]`，默认 CTP 版本抬高到 v6.7.13

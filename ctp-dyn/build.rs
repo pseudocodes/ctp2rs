@@ -136,7 +136,7 @@ fn get_sdk_path() -> &'static std::path::Path {
     // default 版本（ctp_v6_7_13）放最后，仅在没有其他显式版本匹配时生效
     if cfg!(feature = "ctp_v6_7_13") {
         if cfg!(target_os = "macos") {
-            return Path::new("./api/ctp/v6.7.13/v6.7.13_MacOS_20260729");
+            return Path::new("./api/ctp/v6.7.13/v6.7.13_MacOS_20260529");
         }
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.13/v6.7.13_20260225_api_traderapi_se_linux64");

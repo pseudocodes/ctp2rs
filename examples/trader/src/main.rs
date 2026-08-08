@@ -229,7 +229,7 @@ fn dynlib_path() -> std::path::PathBuf {
     let base_dir = var("CARGO_MANIFEST_DIR").unwrap();
 
     #[cfg(all(target_os = "macos", feature = "ctp_v6_7_13"))]
-    let path = "../../ctp-dyn/api/ctp/v6.7.13/v6.7.13_MacOS_20260729/thosttraderapi_se.framework/thosttraderapi_se";
+    let path = "../../ctp-dyn/api/ctp/v6.7.13/v6.7.13_MacOS_20260529/thosttraderapi_se.framework/thosttraderapi_se";
     #[cfg(all(target_os = "linux", feature = "ctp_v6_7_13"))]
     let path = "../../ctp-dyn/api/ctp/v6.7.13/v6.7.13_20260225_api_traderapi_se_linux64/thosttraderapi_se.so";
     #[cfg(all(target_os = "windows", feature = "ctp_v6_7_13"))]
