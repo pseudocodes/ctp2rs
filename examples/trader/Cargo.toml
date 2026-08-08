@@ -1,0 +1,17 @@
+[package]
+name = "trader"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ctp2rs = { path = "../../ctp-dyn/", default-features = false }
+
+log = "0.4.22"
+dotenv = "0.15.0"
+env_logger = "0.11.5"
+
+[features]
+default = ["ctp_v6_7_13"]
+# Re-export dependency features so we can use `#[cfg(feature = "...")]` locally
+ctp_v6_7_13 = ["ctp2rs/v1alpha1", "ctp2rs/ctp_v6_7_13"]
+ctp_v6_7_2 = ["ctp2rs/v1alpha1", "ctp2rs/ctp_v6_7_2"]

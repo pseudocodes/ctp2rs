@@ -39,7 +39,7 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 | ctp v6.7.2      | ctp_v6_7_2  | x     | x     | x       |
 | ctp v6.7.7      | ctp_v6_7_7  | x     | x     | x       |
 | ctp v6.7.11     | ctp_v6_7_11 | x     |       | x       |
-| ctp v6.7.13     | ctp_v6_7_13 | x     |       | x       |
+| ctp v6.7.13     | ctp_v6_7_13 | x     | x     | x       |
 | ctp-mini v1.7.0 | mini_v1_7_0 | x     |       | x       |
 | ctp-mini v1.7.5 | mini_v1_7_5 | x     |       | x       |
 | ctp-sopt v3.7.3 | sopt_v3_7_3 | x     |       | x       |
@@ -49,7 +49,7 @@ ctp2rs = { git = "https://github.com/pseudocodes/ctp2rs", package = "ctp2rs" }
 实际支持版本请查看 *[Cargo.toml](./Cargo.toml)* 中 `[features]` 字段，或开发者可以采用环境变量来指定具体绑定的 CTP API 版本
 `0.1.7` 版本后将不再在项目中跟踪保存 CTP 各版本头文件，除遇各平台主要接口变更
 
-默认 feature 仅启用 `v1alpha1` API 层。未显式选择版本 feature 时，`build.rs` 会 fallback 到 CTP SDK `v6.7.7`，便于各个架构进行测试开发；生产项目建议关闭默认 feature 并显式选择目标版本。`v6.7.11` 及之后版本由于合并了生产和评测版本并在主创建实例接口添加了 `bIsProductionMode` 参数，所以需要在开发时用户自行指定。
+默认 feature 启用 `v1alpha1` API 层和 CTP SDK `ctp_v6_7_13`（含 macOS 预编译 framework）。若关闭默认 feature 且未显式选择版本，`build.rs` 会 fallback 到 CTP SDK `v6.7.7`（非 union 签名，兼容旧版 create 接口）；生产项目建议关闭默认 feature 并显式选择目标版本。`v6.7.11` 及之后版本由于合并了生产和评测版本并在主创建实例接口添加了 `bIsProductionMode` 参数，所以需要在开发时用户自行指定。
 
 ```toml
 [dependencies]
@@ -103,6 +103,7 @@ cargo run --example <example>
 - [openctp](../examples/openctp): 连接 openctp 模拟平台的行情以及交易样例，支持 MacOS 以及 Linux 
 - [insecure](../examples/insecure): 可跨版本加载动态方案 POC Demo, 适用 Linux
 - [tts_sopt](../examples/tts_sopt): ctp-sopt 连接 openctp 股票期权仿真环境 demo 
+- [trader](../examples/trader/): 纯交易端示例（不启用行情），channel 事件驱动串联完整链条
   
 ### open-md-gateway
 

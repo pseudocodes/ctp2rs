@@ -56,7 +56,7 @@ ctp2rs/
 
 ## 版本与 Feature Flag
 
-通过 Cargo feature 选择 CTP 版本：`ctp_v6_7_2`（默认）、`ctp_v6_7_7`、`ctp_v6_7_8`、`ctp_v6_7_9`、`ctp_v6_7_11`、`mini_v1_6_9`、`mini_v1_7_0`、`sopt_v3_7_3`。
+通过 Cargo feature 选择 CTP 版本：`ctp_v6_7_2`、`ctp_v6_7_7`、`ctp_v6_7_11`、`ctp_v6_7_13`（默认）、`mini_v1_7_0`、`mini_v1_7_5`、`sopt_v3_7_3`、`sopt_v3_7_5`。
 
 不同版本/平台下生成的接口数量和参数签名各有差异。`build.rs` 中的 `get_sdk_path()` 根据 feature + 目标平台选择对应的 SDK 路径。
 

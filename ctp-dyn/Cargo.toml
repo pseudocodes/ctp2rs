@@ -1,6 +1,6 @@
 [package]
 name = "ctp2rs"
-version = "0.1.10-alpha4"
+version = "0.1.11-alpha1"
 edition = "2021"
 authors = ["Pseudo <pseudocodes@gmail.com>"]
 description = "Shanghai Futures CTP/CTP-Mini/CTP-Sopt Rust native binding, supporting production, evaluation, stock-option, OpenCTP, and LocalCTP versions, compatible with Linux and macOS"
@@ -25,20 +25,20 @@ exclude = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-clang-sys = { version = "1.8.1", features = ["clang_16_0", "runtime"] }
-clang = { version = "2.0.0", features = ["clang_10_0"] }
+clang-sys = { version = "1.9.1", features = ["clang_16_0", "runtime"] }
+clang = { version = "2.1.0", features = ["clang_10_0"] }
 bindgen = "0.72.0"
-regex = "1.11.1"
+regex = "1.13.1"
 Inflector = "0.11.4"
-roxmltree = "0.20.0"
+roxmltree = "0.21.0"
 
 [dependencies]
-libloading = "0.8.6"
-memchr = "2.7.4"
+libloading = "0.9.0"
+memchr = "2.8.3"
 encoding_rs = "0.8.35"
 
 [features]
-default = ["v1alpha1"]
+default = ["v1alpha1", "ctp_v6_7_13"]
 v1alpha1 = []
 v1alpha2 = []
 

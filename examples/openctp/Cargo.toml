@@ -9,7 +9,7 @@ clap = { version = "4.0", features = ["derive", "env"] }
 ctp2rs = { path = "../../ctp-dyn/", default-features = false }
 
 [features]
-default = ["ctp_v6_7_2"]
+default = ["ctp_v6_7_13"]
 ctp_v6_7_2 = ["ctp2rs/v1alpha1", "ctp2rs/openctp", "ctp2rs/ctp_v6_7_2"]
 ctp_v6_7_11 = ["ctp2rs/v1alpha1", "ctp2rs/openctp", "ctp2rs/ctp_v6_7_11"]
-ctp_v6_7_13 = ["ctp2rs/v1alpha1", "ctp2rs/openctp", "ctp2rs/ctp_v6_7_13"]
+ctp_v6_7_13 = ["ctp2rs/v1alpha1", "ctp2rs/ctp_v6_7_13"]

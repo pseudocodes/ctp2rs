@@ -17,6 +17,7 @@ where
     let popts = ParsingOptions {
         allow_dtd: true,
         nodes_limit: u32::MAX,
+        ..Default::default()
     };
     let doc = Document::parse_with_options(&xml_content, popts)?;
 

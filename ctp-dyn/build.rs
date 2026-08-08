@@ -89,7 +89,7 @@ fn get_sdk_path() -> &'static std::path::Path {
     // ── CTP 主线版本（按优先级排列，非 default 版本优先）──
     // 当 workspace feature unification 导致多个版本同时启用时，
     // 非 default 版本（由 example 显式指定）应优先于 default 版本。
-    // 当前 default = ctp_v6_7_7，因此放在最后匹配。
+    // 当前 default = ctp_v6_7_13，因此放在最后匹配。
 
     if cfg!(feature = "ctp_v6_7_2") {
         if cfg!(target_os = "windows") {
@@ -106,6 +106,21 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
+    if cfg!(feature = "ctp_v6_7_7") {
+        if cfg!(target_os = "macos") {
+            if cfg!(feature = "openctp") {
+                return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+            }
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_MacOS_20240716");
+        }
+        if cfg!(target_os = "linux") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");
+        }
+        if cfg!(target_os = "windows") {
+            return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_traderapi64_se_windows/");
+        }
+    }
+
     if cfg!(feature = "ctp_v6_7_11") {
         if cfg!(target_os = "macos") {
             panic!("`macos` feature not supported for `v6_7_11`.");
@@ -118,9 +133,10 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
+    // default 版本（ctp_v6_7_13）放最后，仅在没有其他显式版本匹配时生效
     if cfg!(feature = "ctp_v6_7_13") {
         if cfg!(target_os = "macos") {
-            panic!("`macos` feature not supported for `v6_7_13`.");
+            return Path::new("./api/ctp/v6.7.13/v6.7.13_MacOS_20260729");
         }
         if cfg!(target_os = "linux") {
             return Path::new("./api/ctp/v6.7.13/v6.7.13_20260225_api_traderapi_se_linux64");
@@ -130,8 +146,8 @@ fn get_sdk_path() -> &'static std::path::Path {
         }
     }
 
-    // default 版本放最后，仅在没有其他版本匹配时生效
-    // 当没有任何版本 feature 启用时，也 fallback 到此版本
+    // 没有任何版本 feature 启用时（default-features = false 且未选版本），
+    // fallback 到 v6.7.7：其 create 接口为非 union 签名，与 builder.rs 默认符号兼容
     if cfg!(target_os = "macos") {
         if cfg!(feature = "openctp") {
             return Path::new("./api/ctp/v6.7.7/v6.7.7_20240607_api_traderapi_se_linux64");

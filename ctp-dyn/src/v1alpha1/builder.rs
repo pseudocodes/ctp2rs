@@ -190,7 +190,7 @@ impl Default for MdApi {
     }
 }
 
-/// Drop 释放顺序：
+/// Drop 释放顺序（若已显式 release() 则跳过 1、2，避免触碰悬垂 api_ptr）：
 /// 1. 注销 SPI 回调（RegisterSpi(null)），防止后续回调触发
 /// 2. 调用 CTP Release 等待内部线程退出，确保无回调在飞行中
 /// 3. 释放 SPI 包装对象内存（此时可安全释放）
@@ -198,18 +198,19 @@ impl Default for MdApi {
 impl Drop for MdApi {
     fn drop(&mut self) {
         let spi_ptr = self.spi_ptr.load(Ordering::Acquire);
-        // 1. 注销 SPI 回调
-        if !spi_ptr.is_null() && !self.api_ptr.is_null() {
-            unsafe {
-                ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterSpi)(
-                    self.api_ptr,
-                    std::ptr::null_mut(),
-                );
-            }
-        }
-        // 2. Release：等待 CTP 内部线程退出
+        // 若已显式 release()，C++ API 对象已销毁，api_ptr 悬垂，不可再触碰
         let already = self.released.swap(true, Ordering::SeqCst);
         if !already && !self.api_ptr.is_null() {
+            // 1. 注销 SPI 回调
+            if !spi_ptr.is_null() {
+                unsafe {
+                    ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_RegisterSpi)(
+                        self.api_ptr,
+                        std::ptr::null_mut(),
+                    );
+                }
+            }
+            // 2. Release：等待 CTP 内部线程退出
             unsafe {
                 ((*(*self.api_ptr).vtable_).CThostFtdcMdApi_Release)(self.api_ptr);
             }
@@ -579,7 +580,7 @@ impl TraderApiBuilder {
     }
 }
 
-/// Drop 释放顺序：
+/// Drop 释放顺序（若已显式 release() 则跳过 1、2，避免触碰悬垂 api_ptr）：
 /// 1. 注销 SPI 回调（RegisterSpi(null)），防止后续回调触发
 /// 2. 调用 CTP Release 等待内部线程退出，确保无回调在飞行中
 /// 3. 释放 SPI 包装对象内存（此时可安全释放）
@@ -587,18 +588,19 @@ impl TraderApiBuilder {
 impl Drop for TraderApi {
     fn drop(&mut self) {
         let spi_ptr = self.spi_ptr.load(Ordering::Acquire);
-        // 1. 注销 SPI 回调
-        if !spi_ptr.is_null() && !self.api_ptr.is_null() {
-            unsafe {
-                ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_RegisterSpi)(
-                    self.api_ptr,
-                    std::ptr::null_mut(),
-                );
-            }
-        }
-        // 2. Release：等待 CTP 内部线程退出
+        // 若已显式 release()，C++ API 对象已销毁，api_ptr 悬垂，不可再触碰
         let already = self.released.swap(true, Ordering::SeqCst);
         if !already && !self.api_ptr.is_null() {
+            // 1. 注销 SPI 回调
+            if !spi_ptr.is_null() {
+                unsafe {
+                    ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_RegisterSpi)(
+                        self.api_ptr,
+                        std::ptr::null_mut(),
+                    );
+                }
+            }
+            // 2. Release：等待 CTP 内部线程退出
             unsafe {
                 ((*(*self.api_ptr).vtable_).CThostFtdcTraderApi_Release)(self.api_ptr);
             }

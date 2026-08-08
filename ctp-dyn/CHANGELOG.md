@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased] - 2026-08-08
+
+### Added
+- 添加 CTP v6.7.13 macOS SDK（`v6.7.13_MacOS_20260729`，含 framework 预编译库），`build.rs` 移除 `ctp_v6_7_13` 的 macOS panic 并新增对应路径分支
+
+### Changed
+- 默认 feature 调整为 `["v1alpha1", "ctp_v6_7_13"]`，默认 CTP 版本抬高到 v6.7.13
+- `build.rs` 版本匹配优先级调整：`ctp_v6_7_7` 改为显式版本分支，default 版本 `ctp_v6_7_13` 降至显式版本之后匹配；无任何版本 feature 时仍 fallback 到 v6.7.7（非 union 签名兼容）
+- 修复 roxmltree `ParsingOptions` 新增字段导致的 codegen 编译错误（补充 `..Default::default()`）
+- 更新 README 版本支持表格及默认 feature 说明
+
+
 ## [Unreleased] - 2026-06-17
 
 ### Added
